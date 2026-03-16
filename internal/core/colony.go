@@ -74,7 +74,7 @@ func NewHeteroAntColony(g *graph.Graph, opts ...ColonyOption) (*HeteroAntColony,
 		defaultAlpha:        DefaultAlpha,
 		defaultBeta:         DefaultBeta,
 		evaporationRate:     DefaultEvaporationRate,
-		pheromoneMultiplier: DefaultPheromone,
+		pheromoneMultiplier: DefaultPheromoneMultiplier,
 		generationPeriod:    DefaultGenerationPeriod,
 		choose:              nil,
 		selection:           nil,
@@ -159,6 +159,10 @@ func (c *HeteroAntColony) Run() {
 	}
 
 	c.state = nil
+}
+
+func (c *HeteroAntColony) Results() ([]*HeteroAnt, []*graph.Vertex, float64) {
+	return c.result.bestPerGeneration, c.result.bestTour, c.result.bestScore
 }
 
 func (c *HeteroAntColony) iteration() {

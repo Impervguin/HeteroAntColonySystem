@@ -3,15 +3,15 @@ package core
 type ColonyOption func(*HeteroAntColony)
 
 const (
-	DefaultColonySize       = 100
-	DefaultGenerationSize   = 100
-	DefaultParentCount      = 2
-	DefaultAlpha            = 1.0
-	DefaultBeta             = 1.0
-	DefaultPheromone        = 1.0
-	DefaultGenerationPeriod = 5
-	DefaultEvaporationRate  = 0.2
-	DefaultInitialPheromone = 1.0
+	DefaultColonySize          = 100
+	DefaultGenerationSize      = 100
+	DefaultParentCount         = 2
+	DefaultAlpha               = 1.0
+	DefaultBeta                = 1.0
+	DefaultPheromoneMultiplier = 1.0
+	DefaultGenerationPeriod    = 5
+	DefaultEvaporationRate     = 0.2
+	DefaultInitialPheromone    = 1.0
 )
 
 func WithColonySize(size uint) ColonyOption {
