@@ -22,9 +22,9 @@ type ChoosePathStrategy interface {
 
 // SelectionStrategy defines the method used in the genetic algorithm
 // to select a subset of ants from the candidate population based on
-// their fitness (tour quality).
+// their fitness (tour quality) for cross.
 type SelectionStrategy interface {
-	Select(candidates []*HeteroAnt, count int) []*HeteroAnt
+	Select(candidates []*HeteroAnt, count uint) []*HeteroAnt
 }
 
 // CrossoverStrategy defines how two parent ants are combined to produce
