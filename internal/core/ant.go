@@ -103,13 +103,16 @@ func (a *HeteroAnt) Run() {
 		tour:    a.inWork.route,
 		visited: a.inWork.visited,
 	}
+
 	score := 0.
-	for i := 0; i < len(res.tour)-1; i++ {
-		e, _ := a.inWork.graph.Edge(res.tour[i], res.tour[i+1])
+	if len(res.tour) > 1 {
+		for i := 0; i < len(res.tour)-1; i++ {
+			e, _ := a.inWork.graph.Edge(res.tour[i], res.tour[i+1])
+			score += e.Weight()
+		}
+		e, _ := a.inWork.graph.Edge(res.tour[len(res.tour)-1], res.tour[0])
 		score += e.Weight()
 	}
-	e, _ := a.inWork.graph.Edge(res.tour[len(res.tour)-1], res.tour[0])
-	score += e.Weight()
 
 	res.score = score
 	a.result = &res
@@ -122,6 +125,13 @@ func (a *HeteroAnt) Score() float64 {
 		return 0.
 	}
 	return a.result.score
+}
+
+func (a *HeteroAnt) Tour() []*graph.Vertex {
+	if a.result == nil {
+		return nil
+	}
+	return a.result.tour
 }
 
 // Visited returns true if the given vertex has already been visited by the ant.

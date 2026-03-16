@@ -10,15 +10,16 @@ import (
 type ClassicChoosePath struct {
 }
 
+var _ core.ChoosePathStrategy = &ClassicChoosePath{}
+
 func NewClassicChoosePath() *ClassicChoosePath {
 	return &ClassicChoosePath{}
 }
 
 func (c *ClassicChoosePath) ChooseNext(
-	state *core.AntState,
+	state core.AntInWorkView,
 	ant *core.HeteroAnt,
 ) (*graph.Vertex, bool) {
-
 	gr := state.Graph()
 	current := state.Current()
 	pm := state.PheromoneMap()

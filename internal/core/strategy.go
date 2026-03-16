@@ -1,13 +1,23 @@
 package core
 
-import "HeteroAntColonySystem/pkg/graph"
+import (
+	"HeteroAntColonySystem/pkg/graph"
+	"HeteroAntColonySystem/pkg/pheromone"
+)
+
+type AntInWorkView interface {
+	Graph() *graph.Graph
+	PheromoneMap() *pheromone.PheromoneMap
+	Current() *graph.Vertex
+	Visited(v *graph.Vertex) bool
+}
 
 // ChoosePathStrategy defines the rule used by an ant to select the next vertex
 // during tour construction. It typically uses pheromone levels, heuristic
 // information, and the ant's parameters (alpha and beta).
 // The returned bool indicates whether the tour is finished.
 type ChoosePathStrategy interface {
-	ChooseNext(state *AntState, ant *HeteroAnt) (*graph.Vertex, bool)
+	ChooseNext(state AntInWorkView, ant *HeteroAnt) (*graph.Vertex, bool)
 }
 
 // SelectionStrategy defines the method used in the genetic algorithm
