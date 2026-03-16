@@ -14,11 +14,12 @@ type testChooseStrategy struct{}
 func (t *testChooseStrategy) ChooseNext(state core.AntInWorkView, ant *core.HeteroAnt) (*graph.Vertex, bool) {
 	var next *graph.Vertex
 
-	state.Graph().ForEachSource(state.Current(), func(e *graph.Edge) {
+	state.Graph().ForEachSource(state.Current(), func(e *graph.Edge) bool {
 		if !state.Visited(e.Target()) {
 			next = e.Target()
-			return
+			return true
 		}
+		return false
 	})
 
 	if next == nil {

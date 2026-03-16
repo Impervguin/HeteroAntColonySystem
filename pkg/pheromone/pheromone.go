@@ -19,8 +19,9 @@ func NewPheromoneMap(gr *graph.Graph, initial float64) *PheromoneMap {
 		mut: sync.RWMutex{},
 	}
 
-	gr.ForEachEdge(func(e *graph.Edge) {
+	gr.ForEachEdge(func(e *graph.Edge) bool {
 		pm.pm[e] = initial
+		return false
 	})
 
 	return pm

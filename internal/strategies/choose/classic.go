@@ -31,9 +31,9 @@ func (c *ClassicChoosePath) ChooseNext(
 
 	candidates := make([]candidate, 0)
 
-	gr.ForEachSource(current, func(e *graph.Edge) {
+	gr.ForEachSource(current, func(e *graph.Edge) bool {
 		if state.Visited(e.Target()) {
-			return
+			return false
 		}
 
 		heuristic := math.Pow(1.0/e.Weight(), ant.Beta())
@@ -43,6 +43,7 @@ func (c *ClassicChoosePath) ChooseNext(
 			vertex: e.Target(),
 			prob:   heuristic * pher,
 		})
+		return false
 	})
 
 	if len(candidates) == 0 {

@@ -64,13 +64,16 @@ func (g *Graph) AddEdge(weight float64, source *Vertex, target *Vertex) error {
 }
 
 // ForEachVertex iterates over all vertices of the graph
-// f should not call any methods on the graph
-func (g *Graph) ForEachVertex(f func(v *Vertex)) {
+// f should not call any update methods on the graph
+func (g *Graph) ForEachVertex(f func(v *Vertex) bool) {
 	g.mut.RLock()
 	defer g.mut.RUnlock()
 
 	for v := range g.vertices {
-		f(v)
+		done := f(v)
+		if done {
+			return
+		}
 	}
 }
 
@@ -94,12 +97,15 @@ func (g *Graph) VerticesChan() <-chan *Vertex {
 
 // ForEachEdge iterates over all edges of the graph
 // f should not call any methods on the graph
-func (g *Graph) ForEachEdge(f func(e *Edge)) {
+func (g *Graph) ForEachEdge(f func(e *Edge) bool) {
 	g.mut.RLock()
 	defer g.mut.RUnlock()
 
 	for _, e := range g.edges {
-		f(e)
+		done := f(e)
+		if done {
+			return
+		}
 	}
 }
 
@@ -122,7 +128,7 @@ func (g *Graph) EdgesChan() <-chan *Edge {
 
 // ForEachSource iterates over all edges that have the given vertex as source
 // f should not call any methods on the graph
-func (g *Graph) ForEachSource(v *Vertex, f func(v *Edge)) {
+func (g *Graph) ForEachSource(v *Vertex, f func(v *Edge) bool) {
 	g.mut.RLock()
 	defer g.mut.RUnlock()
 
@@ -132,7 +138,10 @@ func (g *Graph) ForEachSource(v *Vertex, f func(v *Edge)) {
 	}
 
 	for _, e := range edges {
-		f(e)
+		done := f(e)
+		if done {
+			return
+		}
 	}
 }
 
@@ -155,7 +164,7 @@ func (g *Graph) SourceChan(v *Vertex) <-chan *Edge {
 
 // ForEachTarget iterates over all edges that have the given vertex as target
 // f should not call any methods on the graph
-func (g *Graph) ForEachTarget(v *Vertex, f func(v *Edge)) {
+func (g *Graph) ForEachTarget(v *Vertex, f func(v *Edge) bool) {
 	g.mut.RLock()
 	defer g.mut.RUnlock()
 
@@ -165,7 +174,10 @@ func (g *Graph) ForEachTarget(v *Vertex, f func(v *Edge)) {
 	}
 
 	for _, e := range edges {
-		f(e)
+		done := f(e)
+		if done {
+			return
+		}
 	}
 }
 

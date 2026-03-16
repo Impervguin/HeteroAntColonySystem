@@ -83,8 +83,9 @@ func TestGraphAddVertex(t *testing.T) {
 	}
 
 	count := 0
-	g.ForEachVertex(func(v *Vertex) {
+	g.ForEachVertex(func(v *Vertex) bool {
 		count++
+		return false
 	})
 
 	if count != 1 {
@@ -107,8 +108,9 @@ func TestGraphAddEdge(t *testing.T) {
 	}
 
 	count := 0
-	g.ForEachEdge(func(e *Edge) {
+	g.ForEachEdge(func(e *Edge) bool {
 		count++
+		return false
 	})
 
 	if count != 1 {
@@ -169,8 +171,9 @@ func TestGraphForEachSource(t *testing.T) {
 
 	count := 0
 
-	g.ForEachSource(v1, func(e *Edge) {
+	g.ForEachSource(v1, func(e *Edge) bool {
 		count++
+		return false
 	})
 
 	if count != 2 {
@@ -194,8 +197,9 @@ func TestGraphForEachTarget(t *testing.T) {
 
 	count := 0
 
-	g.ForEachTarget(v3, func(e *Edge) {
+	g.ForEachTarget(v3, func(e *Edge) bool {
 		count++
+		return false
 	})
 
 	if count != 2 {
