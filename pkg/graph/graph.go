@@ -205,3 +205,14 @@ func (g *Graph) Edge(source *Vertex, target *Vertex) (*Edge, bool) {
 	edge, ok := g.dist[source][target]
 	return edge, ok
 }
+
+func (g *Graph) RandomVertex() *Vertex {
+	g.mut.RLock()
+	defer g.mut.RUnlock()
+
+	var v *Vertex
+	for v = range g.vertices {
+		break
+	}
+	return v
+}
