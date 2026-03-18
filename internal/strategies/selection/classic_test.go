@@ -115,5 +115,3 @@ func TestClassicSelectionReturnsEmptySliceWhenCountIsZero(t *testing.T) {
 
 	require.Len(t, res, 0)
 }
-
-

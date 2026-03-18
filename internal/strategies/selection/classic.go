@@ -54,7 +54,7 @@ func (s *ClassicSelection) Select(candidates []*core.HeteroAnt, count uint) []*c
 		heap.Push(&h, ant)
 	}
 
-	res := make([]*core.HeteroAnt, 0, len(candidates))
+	res := make([]*core.HeteroAnt, 0, count)
 	for i := uint(0); i < count; i++ {
 		res = append(res, heap.Pop(&h).(*core.HeteroAnt))
 	}

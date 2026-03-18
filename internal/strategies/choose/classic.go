@@ -4,16 +4,20 @@ import (
 	"HeteroAntColonySystem/internal/core"
 	"HeteroAntColonySystem/pkg/graph"
 	"math"
-	"math/rand/v2"
+	"math/rand"
+	"time"
 )
 
 type ClassicChoosePath struct {
+	r *rand.Rand
 }
 
 var _ core.ChoosePathStrategy = &ClassicChoosePath{}
 
 func NewClassicChoosePath() *ClassicChoosePath {
-	return &ClassicChoosePath{}
+	return &ClassicChoosePath{
+		r: rand.New(rand.NewSource(time.Now().UnixNano())),
+	}
 }
 
 func (c *ClassicChoosePath) ChooseNext(
@@ -55,7 +59,7 @@ func (c *ClassicChoosePath) ChooseNext(
 		sum += c.prob
 	}
 
-	r := rand.Float64() * sum
+	r := c.r.Float64() * sum
 
 	acc := 0.0
 	for _, c := range candidates {

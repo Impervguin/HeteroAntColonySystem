@@ -3,6 +3,7 @@ package core
 import (
 	"HeteroAntColonySystem/pkg/graph"
 	"HeteroAntColonySystem/pkg/pheromone"
+	"math"
 	"math/rand/v2"
 )
 
@@ -46,10 +47,8 @@ type HeteroAntColony struct {
 }
 
 type AntColonyState struct {
-	g             *graph.Graph
-	pm            *pheromone.PheromoneMap
-	initialVertex *graph.Vertex
-
+	g                 *graph.Graph
+	pm                *pheromone.PheromoneMap
 	currentGeneration uint
 	generation        []*HeteroAnt
 
@@ -115,15 +114,9 @@ func (c *HeteroAntColony) Run() {
 		generation:        make([]*HeteroAnt, 0, c.colonySize),
 		bestPerGeneration: make([]*HeteroAnt, 0, c.generationCount),
 		bestTour:          nil,
-		bestScore:         0.,
+		bestScore:         math.Inf(1),
 	}
 	state := c.state
-
-	// Set any as initial vertex
-	state.g.ForEachVertex(func(v *graph.Vertex) bool {
-		state.initialVertex = v
-		return true
-	})
 
 	// Init first generation
 	for i := 0; i < int(c.colonySize); i++ {
@@ -173,7 +166,7 @@ func (c *HeteroAntColony) iteration() {
 
 	// 1. Route building
 	for _, ant := range state.generation {
-		ant.StartAnt(state.g, state.pm, state.initialVertex)
+		ant.StartAnt(state.g, state.pm, state.g.RandomVertex())
 		ant.Run()
 	}
 
@@ -238,7 +231,7 @@ func (c *HeteroAntColony) updateBest() {
 	state.bestPerGeneration = append(state.bestPerGeneration, ant)
 
 	// Best tour
-	if ant.Score() < state.bestScore || state.bestTour == nil {
+	if ant.Score() < state.bestScore {
 		state.bestTour = ant.Tour()
 		state.bestScore = ant.Score()
 	}
