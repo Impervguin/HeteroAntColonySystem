@@ -1,16 +1,20 @@
 package apply
 
-import "HeteroAntColonySystem/internal/core"
+import "HeteroAntColonySystem/internal/core/strategy"
+
+// ApplyClassicStrategy applies pheromone based on ant's path and score
+// Implements strategy.PheromoneApplyingStrategy interface
+
 
 type ApplyClassicStrategy struct{}
 
-var _ core.PheromoneApplyingStrategy = &ApplyClassicStrategy{}
+var _ strategy.PheromoneApplyingStrategy = &ApplyClassicStrategy{}
 
 func NewApplyClassicStrategy() *ApplyClassicStrategy {
 	return &ApplyClassicStrategy{}
 }
 
-func (*ApplyClassicStrategy) ApplyPheromone(ant core.AntView) {
+func (*ApplyClassicStrategy) ApplyPheromone(ant strategy.AntView) {
 	g := ant.Graph()
 	pm := ant.PheromoneMap()
 	path := ant.Path()

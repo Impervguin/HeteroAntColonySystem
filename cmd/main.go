@@ -1,7 +1,8 @@
 package main
 
 import (
-	"HeteroAntColonySystem/internal/core"
+	"HeteroAntColonySystem/internal/core/colony"
+	"HeteroAntColonySystem/internal/core/config"
 	"HeteroAntColonySystem/internal/strategies/apply"
 	"HeteroAntColonySystem/internal/strategies/path"
 	"HeteroAntColonySystem/pkg/algo/aco"
@@ -24,23 +25,27 @@ func main() {
 		panic(err)
 	}
 
-	haco, err := core.NewHeteroAntColony(
-		core.WithDefaultAlpha(2),
-		core.WithDefaultBeta(1.8),
-		core.WithEvaporationRate(0.2),
-		core.WithInitialPheromone(1),
-		core.WithPheromoneMultiplier(1),
-		core.WithColonySize(500),
-		core.WithGenerationCount(500),
-		core.WithPathChoiceStrategy(path.NewPahtClassicStrategy()),
-		core.WithPheromoneApplyingStrategy(apply.NewApplyClassicStrategy()),
+	haco, err := colony.NewHeteroAntColony(
+		config.WithDefaultAlpha(2),
+		config.WithDefaultBeta(1.8),
+		config.WithEvaporationRate(0.2),
+		config.WithInitialPheromone(1),
+		config.WithPheromoneMultiplier(1),
+		config.WithColonySize(500),
+		config.WithGenerationCount(500),
+		config.WithPathChoiceStrategy(path.NewPahtClassicStrategy()),
+		config.WithPheromoneApplyingStrategy(apply.NewApplyClassicStrategy()),
 	)
+
+	if err != nil {
+		panic(err)
+	}
 
 	haco.Prepare(g)
 	haco.Run()
 
-	fmt.Println("HACO best path: ", haco.BestPath())
-	fmt.Println("HACO best score: ", haco.Score())
+	fmt.Println("HACO best path:", haco.BestPath())
+	fmt.Println("HACO best score:", haco.Score())
 
 	// ACO
 	aco, err := aco.NewAntColony(g,
@@ -59,5 +64,5 @@ func main() {
 
 	aco.Run()
 	fmt.Println("ACO best solution:", aco.BestTour())
-	fmt.Println("ACO score: ", aco.BestScore())
+	fmt.Println("ACO score:", aco.BestScore())
 }

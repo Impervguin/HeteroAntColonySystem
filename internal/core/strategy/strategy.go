@@ -1,9 +1,12 @@
-package core
+package strategy
 
 import (
 	"HeteroAntColonySystem/pkg/graph"
 	"HeteroAntColonySystem/pkg/pheromone"
 )
+
+// AntView provides a read-only interface for ant strategies to access
+// necessary information without exposing internal implementation details
 
 type AntView interface {
 	Graph() *graph.Graph

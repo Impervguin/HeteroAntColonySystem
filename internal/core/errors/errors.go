@@ -1,6 +1,8 @@
-package core
+package errors
 
 import "errors"
+
+// Package errors defines all error types used in the Hetero Ant Colony Optimization system.
 
 var (
 	ErrAntNotPrepared = errors.New("ant was not prepared")

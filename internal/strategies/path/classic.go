@@ -1,21 +1,26 @@
 package path
 
 import (
-	"HeteroAntColonySystem/internal/core"
+	"HeteroAntColonySystem/internal/core/strategy"
 	"HeteroAntColonySystem/pkg/graph"
 	"math"
 	"math/rand/v2"
 )
 
+// PathClassicStrategy implements the classic ACO path selection algorithm
+// using probability based on pheromone levels and edge weights
+// Implements strategy.PathChoiceStrategy interface
+
+
 type PathClassicStrategy struct{}
 
-var _ core.PathChoiceStrategy = &PathClassicStrategy{}
+var _ strategy.PathChoiceStrategy = &PathClassicStrategy{}
 
 func NewPahtClassicStrategy() *PathClassicStrategy {
 	return &PathClassicStrategy{}
 }
 
-func (s *PathClassicStrategy) ChooseNext(ant core.AntView) *graph.Vertex {
+func (s *PathClassicStrategy) ChooseNext(ant strategy.AntView) *graph.Vertex {
 	g := ant.Graph()
 	pm := ant.PheromoneMap()
 	current := ant.Current()
@@ -44,7 +49,6 @@ func (s *PathClassicStrategy) ChooseNext(ant core.AntView) *graph.Vertex {
 		return false
 	})
 
-	// fmt.Println(len(candidates))
 	if len(candidates) == 0 {
 		return nil
 	}
