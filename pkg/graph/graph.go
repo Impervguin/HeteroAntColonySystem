@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"math/rand"
 	"sync"
 )
 
@@ -210,9 +211,25 @@ func (g *Graph) RandomVertex() *Vertex {
 	g.mut.RLock()
 	defer g.mut.RUnlock()
 
-	var v *Vertex
-	for v = range g.vertices {
-		break
+	vNum := rand.Intn(len(g.vertices))
+	counter := 0
+	for v, _ := range g.vertices {
+		if counter == vNum {
+			return v
+		}
+		counter++
 	}
-	return v
+	return nil
+}
+
+func (g *Graph) Len() int {
+	g.mut.RLock()
+	defer g.mut.RUnlock()
+	return len(g.vertices)
+}
+
+func (g *Graph) EdgeLen() int {
+	g.mut.RLock()
+	defer g.mut.RUnlock()
+	return len(g.edges)
 }

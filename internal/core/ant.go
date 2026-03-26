@@ -3,154 +3,170 @@ package core
 import (
 	"HeteroAntColonySystem/pkg/graph"
 	"HeteroAntColonySystem/pkg/pheromone"
+	"fmt"
 )
 
-// HeteroAnt represents a single ant in the Ant Colony System with
-// heterogeneous parameters (alpha and beta) that control the influence
-// of pheromone trails and heuristic distance during path selection.
 type HeteroAnt struct {
-	// alpha — influence of pheromone on choosing an edge
-	alpha float64
+	alpha               float64
+	beta                float64
+	pheromoneMultiplier float64
 
-	// beta — influence of heuristic (distance) on choosing an edge
-	beta float64
-
-	// strategy defines how the ant selects the next vertex
-	strategy ChoosePathStrategy
-
-	// inWork stores the current state of the ant during traversal
-	inWork *AntState
-
-	// result stores the completed tour and its score after traversal
-	result *AntResult
+	chooseNext     PathChoiceStrategy
+	pheromoneApply PheromoneApplyingStrategy
+	*HeteroAntWork
 }
 
-// NewHeteroAnt creates a new ant with the given alpha, beta, and path selection strategy.
-func NewHeteroAnt(alpha, beta float64, strategy ChoosePathStrategy) *HeteroAnt {
+type HeteroAntWork struct {
+	g  *graph.Graph
+	pm *pheromone.PheromoneMap
+
+	current *graph.Vertex
+	path    []*graph.Vertex
+	visited map[*graph.Vertex]struct{}
+	done    bool
+
+	score float64
+}
+
+func NewHeteroAnt(alpha, beta, pherMultiplier float64, chooseNext PathChoiceStrategy, pherAppl PheromoneApplyingStrategy) *HeteroAnt {
 	return &HeteroAnt{
-		alpha:    alpha,
-		beta:     beta,
-		strategy: strategy,
+		alpha:               alpha,
+		beta:                beta,
+		pheromoneMultiplier: pherMultiplier,
+		chooseNext:          chooseNext,
+		pheromoneApply:      pherAppl,
+		HeteroAntWork:       nil,
 	}
 }
 
-// Alpha returns the ant's pheromone influence coefficient.
+func (a *HeteroAnt) PathStrategy() PathChoiceStrategy {
+	return a.chooseNext
+}
+
+func (a *HeteroAnt) PheromoneApplyStrategy() PheromoneApplyingStrategy {
+	return a.pheromoneApply
+}
+
 func (a *HeteroAnt) Alpha() float64 {
 	return a.alpha
 }
 
-// Beta returns the ant's heuristic influence coefficient.
 func (a *HeteroAnt) Beta() float64 {
 	return a.beta
 }
 
-// AntState stores the current state of an ant while constructing a tour.
-type AntState struct {
-	graph *graph.Graph
-	pm    *pheromone.PheromoneMap
-
-	// current vertex where the ant is located
-	current *graph.Vertex
-
-	// route contains vertices visited in order so far
-	route []*graph.Vertex
-
-	// visited keeps track of vertices already visited
-	visited map[*graph.Vertex]struct{}
+func (a *HeteroAnt) PheromoneMultiplier() float64 {
+	return a.pheromoneMultiplier
 }
 
-// AntResult stores the completed tour of an ant along with its total score.
-type AntResult struct {
-	// tour is the sequence of visited vertices forming the tour
-	tour []*graph.Vertex
+func (a *HeteroAnt) Prepare(g *graph.Graph, pm *pheromone.PheromoneMap) {
+	a.HeteroAntWork = &HeteroAntWork{
+		g:  g,
+		pm: pm,
 
-	// visited keeps track of vertices visited during the tour
-	visited map[*graph.Vertex]struct{}
-
-	// score is the total weight (length) of the tour
-	score float64
-}
-
-// StartAnt initializes the ant's state for a new traversal starting at the given vertex.
-func (a *HeteroAnt) StartAnt(gr *graph.Graph, pheromoneMap *pheromone.PheromoneMap, initial *graph.Vertex) {
-	a.inWork = &AntState{
-		graph:   gr,
-		current: initial,
-		pm:      pheromoneMap,
-		route:   []*graph.Vertex{initial},
-		visited: map[*graph.Vertex]struct{}{initial: {}},
+		current: g.RandomVertex(),
+		path:    make([]*graph.Vertex, 0, g.Len()),
+		visited: make(map[*graph.Vertex]struct{}, g.Len()),
+		done:    false,
+		score:   -1,
 	}
+
+	a.path = append(a.path, a.current)
+	a.visited[a.current] = struct{}{}
 }
 
-// step performs a single step of the ant's traversal, returning true if the tour is complete.
-func (a *HeteroAnt) step() bool {
-	next, done := a.strategy.ChooseNext(a.inWork, a)
-	if done {
-		return true
+func (a *HeteroAnt) Run() error {
+	if a.HeteroAntWork == nil {
+		return ErrAntNotPrepared
 	}
-	a.inWork.route = append(a.inWork.route, next)
-	a.inWork.current = next
-	a.inWork.visited[next] = struct{}{}
-	return false
-}
-
-// Run executes the ant's traversal until a complete tour is constructed and
-// calculates its total score.
-func (a *HeteroAnt) Run() {
 	for !a.step() {
 	}
-	res := AntResult{
-		tour:    a.inWork.route,
-		visited: a.inWork.visited,
-	}
-
-	score := 0.
-	if len(res.tour) > 1 {
-		for i := 0; i < len(res.tour)-1; i++ {
-			e, _ := a.inWork.graph.Edge(res.tour[i], res.tour[i+1])
-			score += e.Weight()
-		}
-		e, _ := a.inWork.graph.Edge(res.tour[len(res.tour)-1], res.tour[0])
-		score += e.Weight()
-	}
-
-	res.score = score
-	a.result = &res
-	a.inWork = nil
+	a.done = true
+	a.calculateScore()
+	return nil
 }
 
-// Score returns the total score (length) of the ant's completed tour.
+func (a *HeteroAnt) ApplyPheromone() error {
+	if a.HeteroAntWork == nil || !a.done {
+		return ErrAntNotDone
+	}
+
+	a.pheromoneApply.ApplyPheromone(a)
+	return nil
+}
+
 func (a *HeteroAnt) Score() float64 {
-	if a.result == nil {
-		return 0.
+	if a.HeteroAntWork == nil || !a.done {
+		return -1
 	}
-	return a.result.score
+
+	if a.score == -1 {
+		a.calculateScore()
+	}
+
+	return a.score
 }
 
-func (a *HeteroAnt) Tour() []*graph.Vertex {
-	if a.result == nil {
+func (a *HeteroAnt) Path() []*graph.Vertex {
+	if a.HeteroAntWork == nil || !a.done {
 		return nil
 	}
-	return a.result.tour
+	return a.path
 }
 
-// Visited returns true if the given vertex has already been visited by the ant.
-func (a *AntState) Visited(v *graph.Vertex) bool {
+func (a *HeteroAnt) Visited(v *graph.Vertex) bool {
+	if a.HeteroAntWork == nil {
+		fmt.Println("nil")
+		return false
+	}
 	_, ok := a.visited[v]
 	return ok
 }
 
-// Current returns the vertex where the ant currently resides.
-func (a *AntState) Current() *graph.Vertex {
+func (a *HeteroAnt) Graph() *graph.Graph {
+	if a.HeteroAntWork == nil {
+		return nil
+	}
+	return a.g
+}
+
+func (a *HeteroAnt) PheromoneMap() *pheromone.PheromoneMap {
+	if a.HeteroAntWork == nil {
+		return nil
+	}
+	return a.HeteroAntWork.pm
+}
+
+func (a *HeteroAnt) Current() *graph.Vertex {
+	if a.HeteroAntWork == nil || a.done {
+		return nil
+	}
 	return a.current
 }
 
-// Graph returns the graph used by the ant during traversal.
-func (a *AntState) Graph() *graph.Graph {
-	return a.graph
+func (a *HeteroAnt) step() bool {
+	next := a.chooseNext.ChooseNext(a)
+	// fmt.Println(next)
+	if next == nil {
+		return true
+	}
+	a.current = next
+	a.visited[a.current] = struct{}{}
+	a.path = append(a.path, a.current)
+	return false
 }
 
-// PheromoneMap returns the pheromone map used for probabilistic decisions.
-func (a *AntState) PheromoneMap() *pheromone.PheromoneMap {
-	return a.pm
+func (a *HeteroAnt) calculateScore() {
+	a.score = 0
+	if len(a.path) <= 1 {
+		return
+	}
+
+	for i := 0; i < len(a.path)-1; i++ {
+		v1, v2 := a.path[i], a.path[i+1]
+		e, _ := a.g.Edge(v1, v2)
+		a.score += e.Weight()
+	}
+	wrapE, _ := a.g.Edge(a.path[len(a.path)-1], a.path[0])
+	a.score += wrapE.Weight()
 }
