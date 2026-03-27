@@ -7,6 +7,7 @@ import (
 	"HeteroAntColonySystem/internal/core/strategy"
 	"HeteroAntColonySystem/pkg/graph"
 	"HeteroAntColonySystem/pkg/pheromone"
+	"math/rand"
 )
 
 // HeteroAntColony represents a colony of heterogeneous ants in the ACO algorithm.
@@ -19,6 +20,9 @@ type HeteroAntColony struct {
 	// Configuration (immutable after creation)
 	pathChoice     strategy.PathChoiceStrategy
 	pheromoneApply strategy.PheromoneApplyingStrategy
+	parentSelect   strategy.ParentSelectionStrategy
+	crossover      strategy.CrossoverStrategy
+	mutation       strategy.MutationStrategy
 
 	defaultAlpha        float64
 	defaultBeta         float64
@@ -26,8 +30,10 @@ type HeteroAntColony struct {
 	evaporationRate     float64
 	initialPheromone    float64
 
-	generationCount uint
-	colonySize      uint
+	generationCount  uint
+	colonySize       uint
+	generationPeriod uint
+	parentCount      uint
 
 	// Runtime state
 	g    *graph.Graph
@@ -89,6 +95,9 @@ func NewHeteroAntColony(opts ...config.HeteroAntColonyOption) (*HeteroAntColony,
 	return &HeteroAntColony{
 		pathChoice:          cfg.PathChoice,
 		pheromoneApply:      cfg.PheromoneApply,
+		parentSelect:        cfg.ParentSelect,
+		crossover:           cfg.Crossover,
+		mutation:            cfg.Mutation,
 		defaultAlpha:        cfg.DefaultAlpha,
 		defaultBeta:         cfg.DefaultBeta,
 		pheromoneMultiplier: cfg.PheromoneMultiplier,
@@ -96,6 +105,8 @@ func NewHeteroAntColony(opts ...config.HeteroAntColonyOption) (*HeteroAntColony,
 		initialPheromone:    cfg.InitialPheromone,
 		generationCount:     cfg.GenerationCount,
 		colonySize:          cfg.ColonySize,
+		generationPeriod:    cfg.GenerationPeriod,
+		parentCount:         cfg.ParentCount,
 	}, nil
 }
 
@@ -145,6 +156,7 @@ func (c *HeteroAntColony) Run() error {
 				bestInGen = a
 			}
 		}
+		// fmt.Println(bestInGen.Alpha(), bestInGen.Beta(), bestInGen.Score())
 
 		// Update global best if needed
 		if c.best == nil || bestInGen.Score() < c.best.Score() {
@@ -162,7 +174,9 @@ func (c *HeteroAntColony) Run() error {
 		}
 
 		// Phase 5: Prepare next generation (reuse ant objects with same config)
-		c.prepareNextGeneration()
+		if gen%c.generationPeriod == 0 {
+			c.prepareNextGeneration()
+		}
 	}
 
 	// Final score
@@ -182,12 +196,39 @@ func (c *HeteroAntColony) evaporatePheromones() {
 	})
 }
 
-// prepareNextGeneration resets ant paths while keeping their configurations.
-// This allows ants to learn from previous generations' experiences.
+// prepareNextGeneration creates new ants based on selection, crossover, and mutation.
 func (c *HeteroAntColony) prepareNextGeneration() {
-	// Ants retain their alpha, beta, pheromoneMultiplier, and strategies
-	// They will be re-prepared with new paths in the next iteration
-	// This avoids recreating ant objects unnecessarily
+
+	// Select parents
+	views := make([]strategy.AntView, 0, len(c.ants))
+	for _, ant := range c.ants {
+		views = append(views, ant)
+	}
+	parents := c.parentSelect.SelectParents(views, c.parentCount)
+
+	// Crossover
+	offspring := make([]strategy.AntView, 0, c.colonySize)
+	for i := 0; uint(i) < c.colonySize; i++ {
+		ind1 := rand.Intn(len(parents) - 1)
+		ind2 := rand.Intn(len(parents) - 1)
+		if ind1 == ind2 {
+			ind2++
+		}
+		p1, p2 := parents[ind1], parents[ind2]
+		offspring = append(offspring, c.crossover.Crossover(p1, p2))
+	}
+
+	// Mutation
+	for i := 0; uint(i) < c.colonySize; i++ {
+		offspring[i] = c.mutation.Mutate(offspring[i])
+	}
+
+	// Replace ants
+	newGen := make([]*ant.HeteroAnt, 0, c.colonySize)
+	for _, v := range offspring {
+		newGen = append(newGen, v.(*ant.HeteroAnt))
+	}
+	c.ants = newGen
 }
 
 // Score returns the score of the best solution found.

@@ -95,7 +95,6 @@ func (a *HeteroAnt) Run() error {
 		// Continue until step returns true (no more vertices)
 	}
 	a.done = true
-	a.calculateScore()
 	return nil
 }
 

@@ -20,6 +20,9 @@ type AntView interface {
 	Alpha() float64
 	Beta() float64
 	PheromoneMultiplier() float64
+
+	PathStrategy() PathChoiceStrategy
+	PheromoneApplyStrategy() PheromoneApplyingStrategy
 }
 
 type PathChoiceStrategy interface {
@@ -30,4 +33,16 @@ type PathChoiceStrategy interface {
 
 type PheromoneApplyingStrategy interface {
 	ApplyPheromone(ant AntView)
+}
+
+type ParentSelectionStrategy interface {
+	SelectParents(ants []AntView, n uint) []AntView
+}
+
+type CrossoverStrategy interface {
+	Crossover(p1, p2 AntView) AntView
+}
+
+type MutationStrategy interface {
+	Mutate(ant AntView) AntView
 }

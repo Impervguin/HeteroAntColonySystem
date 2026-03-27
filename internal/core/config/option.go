@@ -12,6 +12,9 @@ type HeteroAntColonyOption func(colony *ColonyConfig)
 type ColonyConfig struct {
 	PathChoice     strategy.PathChoiceStrategy
 	PheromoneApply strategy.PheromoneApplyingStrategy
+	ParentSelect   strategy.ParentSelectionStrategy
+	Crossover      strategy.CrossoverStrategy
+	Mutation       strategy.MutationStrategy
 
 	DefaultAlpha        float64
 	DefaultBeta         float64
@@ -19,19 +22,24 @@ type ColonyConfig struct {
 	EvaporationRate     float64
 	InitialPheromone    float64
 
+	GenerationPeriod uint
+	ParentCount      uint
+
 	GenerationCount uint
 	ColonySize      uint
 }
 
 // Default configuration values.
 const (
-	DefaultAlpha         = 1.0
-	DefaultBeta          = 1.0
-	DefaultPheromoneMult = 1.0
-	DefaultEvaporation   = 0.2
-	DefaultPheromone     = 1.0
-	DefaultGenerations   = 100
-	DefaultColonySize    = 100
+	DefaultAlpha            = 1.0
+	DefaultBeta             = 1.0
+	DefaultPheromoneMult    = 1.0
+	DefaultEvaporation      = 0.2
+	DefaultPheromone        = 1.0
+	DefaultGenerations      = 100
+	DefaultColonySize       = 100
+	DefaultGenerationPeriod = 5
+	DefaultParentCount      = 20
 )
 
 // WithDefaultAlpha sets the default alpha parameter for ants.
@@ -83,6 +91,18 @@ func WithColonySize(size uint) HeteroAntColonyOption {
 	}
 }
 
+func WithGenerationPeriod(period uint) HeteroAntColonyOption {
+	return func(colony *ColonyConfig) {
+		colony.GenerationPeriod = period
+	}
+}
+
+func WithParentCount(count uint) HeteroAntColonyOption {
+	return func(colony *ColonyConfig) {
+		colony.ParentCount = count
+	}
+}
+
 // WithPathChoiceStrategy sets the path selection strategy for ants.
 func WithPathChoiceStrategy(choice strategy.PathChoiceStrategy) HeteroAntColonyOption {
 	return func(colony *ColonyConfig) {
@@ -94,5 +114,26 @@ func WithPathChoiceStrategy(choice strategy.PathChoiceStrategy) HeteroAntColonyO
 func WithPheromoneApplyingStrategy(apply strategy.PheromoneApplyingStrategy) HeteroAntColonyOption {
 	return func(colony *ColonyConfig) {
 		colony.PheromoneApply = apply
+	}
+}
+
+// WithParentSelectionStrategy sets the parent selection strategy.
+func WithParentSelectionStrategy(sel strategy.ParentSelectionStrategy) HeteroAntColonyOption {
+	return func(colony *ColonyConfig) {
+		colony.ParentSelect = sel
+	}
+}
+
+// WithCrossoverStrategy sets the crossover strategy.
+func WithCrossoverStrategy(crossover strategy.CrossoverStrategy) HeteroAntColonyOption {
+	return func(colony *ColonyConfig) {
+		colony.Crossover = crossover
+	}
+}
+
+// WithMutationStrategy sets the mutation strategy.
+func WithMutationStrategy(mutation strategy.MutationStrategy) HeteroAntColonyOption {
+	return func(colony *ColonyConfig) {
+		colony.Mutation = mutation
 	}
 }
