@@ -9,6 +9,7 @@ import (
 	"HeteroAntColonySystem/internal/strategies/path"
 	"HeteroAntColonySystem/internal/strategies/selection"
 	"HeteroAntColonySystem/pkg/algo/aco"
+	"HeteroAntColonySystem/pkg/algo/greedy"
 	"HeteroAntColonySystem/pkg/tsplib"
 	"HeteroAntColonySystem/pkg/tsplib/adapters"
 	"fmt"
@@ -28,6 +29,7 @@ func main() {
 		panic(err)
 	}
 
+	// HACO
 	haco, err := colony.NewHeteroAntColony(
 		config.WithDefaultAlpha(1),
 		config.WithDefaultBeta(1),
@@ -65,6 +67,12 @@ func main() {
 		aco.WithColonySize(500),
 		aco.WithGenerationCount(500),
 	)
+
+	// Greedy
+	greed := greedy.NewGreedyAlgorithm(g)
+	greed.Run()
+	fmt.Println("Greedy best path:", greed.Tour())
+	fmt.Println("Greedy best score:", greed.Score())
 
 	if err != nil {
 		panic(err)
