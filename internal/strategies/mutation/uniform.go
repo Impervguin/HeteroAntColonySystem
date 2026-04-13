@@ -10,6 +10,8 @@ type UniformMutationStrategy struct {
 	l, r float64
 }
 
+var _ strategy.MutationStrategy = (*UniformMutationStrategy)(nil)
+
 func NewUniformMutationStrategy(l, r float64) *UniformMutationStrategy {
 	return &UniformMutationStrategy{
 		l: l,
