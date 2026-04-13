@@ -1,7 +1,8 @@
 package selection
 
 import (
-	"HeteroAntColonySystem/internal/core/strategy"
+	"HeteroAntColonySystem/internal/core/ant"
+	"HeteroAntColonySystem/internal/core/colony"
 	"math/rand/v2"
 )
 
@@ -9,7 +10,7 @@ type TournamentSelectionStrategy struct {
 	k uint
 }
 
-var _ strategy.ParentSelectionStrategy = (*TournamentSelectionStrategy)(nil)
+var _ colony.ParentSelectionStrategy = (*TournamentSelectionStrategy)(nil)
 
 func NewTournamentSelectionStrategy(k uint) *TournamentSelectionStrategy {
 	return &TournamentSelectionStrategy{
@@ -17,10 +18,10 @@ func NewTournamentSelectionStrategy(k uint) *TournamentSelectionStrategy {
 	}
 }
 
-func (s *TournamentSelectionStrategy) SelectParents(ants []strategy.AntView, n uint) []strategy.AntView {
-	res := make([]strategy.AntView, 0, n)
+func (s *TournamentSelectionStrategy) SelectParents(ants []ant.AntView, n uint) []ant.AntView {
+	res := make([]ant.AntView, 0, n)
 
-	samples := make([]strategy.AntView, s.k)
+	samples := make([]ant.AntView, s.k)
 	for i := 0; uint(i) < n; i++ {
 		for j := 0; uint(j) < s.k; j++ {
 			r := rand.IntN(len(ants))

@@ -2,7 +2,7 @@ package mutation
 
 import (
 	"HeteroAntColonySystem/internal/core/ant"
-	"HeteroAntColonySystem/internal/core/strategy"
+	"HeteroAntColonySystem/internal/core/colony"
 	"math/rand/v2"
 )
 
@@ -11,7 +11,7 @@ type GaussMutationStrategy struct {
 	mu    float64
 }
 
-var _ strategy.MutationStrategy = (*GaussMutationStrategy)(nil)
+var _ colony.MutationStrategy = (*GaussMutationStrategy)(nil)
 
 func normalRand(sigma, mu float64) float64 {
 	return rand.NormFloat64()*sigma + mu
@@ -24,7 +24,7 @@ func NewGaussMutationStrategy(sigma, mu float64) *GaussMutationStrategy {
 	}
 }
 
-func (s *GaussMutationStrategy) Mutate(a strategy.AntView) strategy.AntView {
+func (s *GaussMutationStrategy) Mutate(a ant.AntView) *ant.HeteroAnt {
 	alpha := normalRand(s.sigma, s.mu)
 	beta := normalRand(s.sigma, s.mu)
 

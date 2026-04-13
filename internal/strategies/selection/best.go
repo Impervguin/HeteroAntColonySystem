@@ -1,7 +1,8 @@
 package selection
 
 import (
-	"HeteroAntColonySystem/internal/core/strategy"
+	"HeteroAntColonySystem/internal/core/ant"
+	"HeteroAntColonySystem/internal/core/colony"
 	"slices"
 )
 
@@ -11,13 +12,15 @@ func NewBestSelectionStrategy() *BestSelectionStrategy {
 	return &BestSelectionStrategy{}
 }
 
-func (s *BestSelectionStrategy) SelectParents(ants []strategy.AntView, n uint) []strategy.AntView {
-	tmp := make([]strategy.AntView, 0, n)
+var _ colony.ParentSelectionStrategy = (*BestSelectionStrategy)(nil)
+
+func (s *BestSelectionStrategy) SelectParents(ants []ant.AntView, n uint) []ant.AntView {
+	tmp := make([]ant.AntView, 0, n)
 	for _, ant := range ants {
 		tmp = append(tmp, ant)
 	}
 
-	slices.SortFunc(tmp, func(a, b strategy.AntView) int {
+	slices.SortFunc(tmp, func(a, b ant.AntView) int {
 		return int(a.Score() - b.Score())
 	})
 

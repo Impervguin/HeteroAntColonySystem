@@ -2,9 +2,7 @@ package colony
 
 import (
 	"HeteroAntColonySystem/internal/core/ant"
-	"HeteroAntColonySystem/internal/core/config"
 	"HeteroAntColonySystem/internal/core/errors"
-	"HeteroAntColonySystem/internal/core/strategy"
 	"HeteroAntColonySystem/pkg/graph"
 	"HeteroAntColonySystem/pkg/pheromone"
 	"math/rand"
@@ -18,11 +16,11 @@ import (
 // setup of algorithm parameters and strategies.
 type HeteroAntColony struct {
 	// Configuration (immutable after creation)
-	pathChoice     strategy.PathChoiceStrategy
-	pheromoneApply strategy.PheromoneApplyingStrategy
-	parentSelect   strategy.ParentSelectionStrategy
-	crossover      strategy.CrossoverStrategy
-	mutation       strategy.MutationStrategy
+	pathChoice     ant.PathChoiceStrategy
+	pheromoneApply ant.PheromoneApplyingStrategy
+	parentSelect   ParentSelectionStrategy
+	crossover      CrossoverStrategy
+	mutation       MutationStrategy
 
 	defaultAlpha        float64
 	defaultBeta         float64
@@ -47,18 +45,18 @@ type HeteroAntColony struct {
 
 // NewHeteroAntColony creates a new heterogeneous ant colony with the given options.
 // Returns an error if required strategies are not set or if parameters are invalid.
-func NewHeteroAntColony(opts ...config.HeteroAntColonyOption) (*HeteroAntColony, error) {
+func NewHeteroAntColony(opts ...HeteroAntColonyOption) (*HeteroAntColony, error) {
 	// Create config with default values
-	cfg := &config.ColonyConfig{
+	cfg := &ColonyConfig{
 		PathChoice:          nil,
 		PheromoneApply:      nil,
-		DefaultAlpha:        config.DefaultAlpha,
-		DefaultBeta:         config.DefaultBeta,
-		PheromoneMultiplier: config.DefaultPheromoneMult,
-		EvaporationRate:     config.DefaultEvaporation,
-		InitialPheromone:    config.DefaultPheromone,
-		GenerationCount:     config.DefaultGenerations,
-		ColonySize:          config.DefaultColonySize,
+		DefaultAlpha:        DefaultAlpha,
+		DefaultBeta:         DefaultBeta,
+		PheromoneMultiplier: DefaultPheromoneMult,
+		EvaporationRate:     DefaultEvaporation,
+		InitialPheromone:    DefaultPheromone,
+		GenerationCount:     DefaultGenerations,
+		ColonySize:          DefaultColonySize,
 	}
 
 	// Apply user-provided options
@@ -200,14 +198,14 @@ func (c *HeteroAntColony) evaporatePheromones() {
 func (c *HeteroAntColony) prepareNextGeneration() {
 
 	// Select parents
-	views := make([]strategy.AntView, 0, len(c.ants))
+	views := make([]ant.AntView, 0, len(c.ants))
 	for _, ant := range c.ants {
 		views = append(views, ant)
 	}
 	parents := c.parentSelect.SelectParents(views, c.parentCount)
 
 	// Crossover
-	offspring := make([]strategy.AntView, 0, c.colonySize)
+	offspring := make([]*ant.HeteroAnt, 0, c.colonySize)
 	for i := 0; uint(i) < c.colonySize; i++ {
 		ind1 := rand.Intn(len(parents) - 1)
 		ind2 := rand.Intn(len(parents) - 1)
@@ -224,11 +222,7 @@ func (c *HeteroAntColony) prepareNextGeneration() {
 	}
 
 	// Replace ants
-	newGen := make([]*ant.HeteroAnt, 0, c.colonySize)
-	for _, v := range offspring {
-		newGen = append(newGen, v.(*ant.HeteroAnt))
-	}
-	c.ants = newGen
+	c.ants = offspring
 }
 
 // Score returns the score of the best solution found.

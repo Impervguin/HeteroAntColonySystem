@@ -1,4 +1,4 @@
-package strategy
+package ant
 
 import (
 	"HeteroAntColonySystem/pkg/graph"
@@ -23,26 +23,4 @@ type AntView interface {
 
 	PathStrategy() PathChoiceStrategy
 	PheromoneApplyStrategy() PheromoneApplyingStrategy
-}
-
-type PathChoiceStrategy interface {
-	// ChooseNext Chooses next vertex for ants path
-	// must return nil if path done
-	ChooseNext(ant AntView) *graph.Vertex
-}
-
-type PheromoneApplyingStrategy interface {
-	ApplyPheromone(ant AntView)
-}
-
-type ParentSelectionStrategy interface {
-	SelectParents(ants []AntView, n uint) []AntView
-}
-
-type CrossoverStrategy interface {
-	Crossover(p1, p2 AntView) AntView
-}
-
-type MutationStrategy interface {
-	Mutate(ant AntView) AntView
 }

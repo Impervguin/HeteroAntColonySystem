@@ -2,7 +2,6 @@ package ant
 
 import (
 	"HeteroAntColonySystem/internal/core/errors"
-	"HeteroAntColonySystem/internal/core/strategy"
 	"HeteroAntColonySystem/pkg/graph"
 	"HeteroAntColonySystem/pkg/pheromone"
 )
@@ -20,8 +19,8 @@ type HeteroAnt struct {
 	pheromoneMultiplier float64
 
 	// Strategies
-	chooseNext     strategy.PathChoiceStrategy
-	pheromoneApply strategy.PheromoneApplyingStrategy
+	chooseNext     PathChoiceStrategy
+	pheromoneApply PheromoneApplyingStrategy
 
 	// Runtime state (initialized in Prepare)
 	g       *graph.Graph
@@ -34,7 +33,7 @@ type HeteroAnt struct {
 }
 
 // NewHeteroAnt creates a new heterogeneous ant with the given parameters and strategies.
-func NewHeteroAnt(alpha, beta, pherMultiplier float64, chooseNext strategy.PathChoiceStrategy, pherAppl strategy.PheromoneApplyingStrategy) *HeteroAnt {
+func NewHeteroAnt(alpha, beta, pherMultiplier float64, chooseNext PathChoiceStrategy, pherAppl PheromoneApplyingStrategy) *HeteroAnt {
 	return &HeteroAnt{
 		alpha:               alpha,
 		beta:                beta,
@@ -60,12 +59,12 @@ func (a *HeteroAnt) PheromoneMultiplier() float64 {
 }
 
 // PathStrategy returns the path choice strategy used by this ant.
-func (a *HeteroAnt) PathStrategy() strategy.PathChoiceStrategy {
+func (a *HeteroAnt) PathStrategy() PathChoiceStrategy {
 	return a.chooseNext
 }
 
 // PheromoneApplyStrategy returns the pheromone applying strategy used by this ant.
-func (a *HeteroAnt) PheromoneApplyStrategy() strategy.PheromoneApplyingStrategy {
+func (a *HeteroAnt) PheromoneApplyStrategy() PheromoneApplyingStrategy {
 	return a.pheromoneApply
 }
 

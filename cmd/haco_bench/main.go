@@ -2,7 +2,6 @@ package main
 
 import (
 	"HeteroAntColonySystem/internal/core/colony"
-	"HeteroAntColonySystem/internal/core/config"
 	"HeteroAntColonySystem/internal/strategies/apply"
 	"HeteroAntColonySystem/internal/strategies/crossover"
 	"HeteroAntColonySystem/internal/strategies/mutation"
@@ -152,20 +151,20 @@ func main() {
 
 			// Configure HACO
 			haco, err := colony.NewHeteroAntColony(
-				config.WithDefaultAlpha(2),
-				config.WithDefaultBeta(1.8),
-				config.WithEvaporationRate(0.5),
-				config.WithInitialPheromone(1),
-				config.WithPheromoneMultiplier(4),
-				config.WithColonySize(400),
-				config.WithGenerationCount(400),
-				config.WithGenerationPeriod(10),
-				config.WithParentCount(20),
-				config.WithPathChoiceStrategy(path.NewPahtClassicStrategy()),
-				config.WithPheromoneApplyingStrategy(apply.NewApplyClassicStrategy()),
-				config.WithCrossoverStrategy(crossover.NewAriphmeticCrossoverStrategy()),
-				config.WithMutationStrategy(mutation.NewUniformMutationStrategy(-0.2, 0.2)),
-				config.WithParentSelectionStrategy(selection.NewBestSelectionStrategy()),
+				colony.WithDefaultAlpha(2),
+				colony.WithDefaultBeta(1.8),
+				colony.WithEvaporationRate(0.5),
+				colony.WithInitialPheromone(1),
+				colony.WithPheromoneMultiplier(4),
+				colony.WithColonySize(400),
+				colony.WithGenerationCount(400),
+				colony.WithGenerationPeriod(10),
+				colony.WithParentCount(20),
+				colony.WithPathChoiceStrategy(path.NewPahtClassicStrategy()),
+				colony.WithPheromoneApplyingStrategy(apply.NewApplyClassicStrategy()),
+				colony.WithCrossoverStrategy(crossover.NewAriphmeticCrossoverStrategy()),
+				colony.WithMutationStrategy(mutation.NewUniformMutationStrategy(-0.2, 0.2)),
+				colony.WithParentSelectionStrategy(selection.NewBestSelectionStrategy()),
 			)
 
 			if err != nil {

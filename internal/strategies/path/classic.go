@@ -1,7 +1,7 @@
 package path
 
 import (
-	"HeteroAntColonySystem/internal/core/strategy"
+	"HeteroAntColonySystem/internal/core/ant"
 	"HeteroAntColonySystem/pkg/graph"
 	"math"
 	"math/rand/v2"
@@ -11,16 +11,15 @@ import (
 // using probability based on pheromone levels and edge weights
 // Implements strategy.PathChoiceStrategy interface
 
-
 type PathClassicStrategy struct{}
 
-var _ strategy.PathChoiceStrategy = &PathClassicStrategy{}
+var _ ant.PathChoiceStrategy = &PathClassicStrategy{}
 
 func NewPahtClassicStrategy() *PathClassicStrategy {
 	return &PathClassicStrategy{}
 }
 
-func (s *PathClassicStrategy) ChooseNext(ant strategy.AntView) *graph.Vertex {
+func (s *PathClassicStrategy) ChooseNext(ant ant.AntView) *graph.Vertex {
 	g := ant.Graph()
 	pm := ant.PheromoneMap()
 	current := ant.Current()
