@@ -1,10 +1,12 @@
 package main
 
 import (
+	"HeteroAntColonySystem/internal/core/ant"
 	"HeteroAntColonySystem/internal/core/colony"
 	"HeteroAntColonySystem/internal/strategies/apply"
 	"HeteroAntColonySystem/internal/strategies/crossover"
 	"HeteroAntColonySystem/internal/strategies/mutation"
+	"HeteroAntColonySystem/internal/strategies/optimisation"
 	"HeteroAntColonySystem/internal/strategies/path"
 	"HeteroAntColonySystem/internal/strategies/selection"
 	"HeteroAntColonySystem/pkg/tsplib"
@@ -39,7 +41,6 @@ func NewFileLock(filename string) (*FileLock, error) {
 }
 
 func writeResultWithLock(csvPath string, record []string) error {
-	// Создаем блокировку для файла
 	lock, err := NewFileLock(csvPath)
 	if err != nil {
 		return fmt.Errorf("failed to create file lock: %v", err)
@@ -47,12 +48,10 @@ func writeResultWithLock(csvPath string, record []string) error {
 	defer lock.f.Close()
 	defer lock.Unlock()
 
-	// Блокируем файл для эксклюзивного доступа
 	if err := lock.Lock(); err != nil {
 		return fmt.Errorf("failed to lock file: %v", err)
 	}
 
-	// Открываем файл для добавления
 	file, err := os.OpenFile(csvPath, os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %v", err)
@@ -70,9 +69,7 @@ func writeResultWithLock(csvPath string, record []string) error {
 }
 
 func writeHeaderIfNeeded(csvPath string) error {
-	// Проверяем существует ли файл
 	if _, err := os.Stat(csvPath); os.IsNotExist(err) {
-		// Файл не существует, создаем и пишем заголовок
 		lock, err := NewFileLock(csvPath)
 		if err != nil {
 			return fmt.Errorf("failed to create file lock: %v", err)
@@ -91,7 +88,11 @@ func writeHeaderIfNeeded(csvPath string) error {
 		defer file.Close()
 
 		writer := csv.NewWriter(file)
-		header := []string{"file", "algorithm", "run", "score", "duration_ms", "memory_kb"}
+		header := []string{
+			"file", "run", "score", "duration_ms", "memory_kb",
+			"local_optimization", "selection_strategy", "mutation_strategy",
+			"mutation_rate", "crossover_strategy",
+		}
 		if err := writer.Write(header); err != nil {
 			return fmt.Errorf("failed to write header: %v", err)
 		}
@@ -100,22 +101,90 @@ func writeHeaderIfNeeded(csvPath string) error {
 	return nil
 }
 
+// Configuration struct for experiment
+type ExperimentConfig struct {
+	Name              string
+	LocalOptimization ant.LocalOptimisationStrategy
+	SelectionStrategy colony.ParentSelectionStrategy
+	MutationStrategy  colony.MutationStrategy
+	CrossoverStrategy colony.CrossoverStrategy
+}
+
 func main() {
 	if len(os.Args) < 4 {
-		fmt.Println("Usage: go run main_haco.go <output.csv> <runs_per_file> <tsp_file1> <tsp_file2> ...")
+		fmt.Println("Usage: go run main_haco.go <output.csv> <runs_per_config> <tsp_file1> <tsp_file2> ...")
 		os.Exit(1)
 	}
 
 	outputFile := os.Args[1]
-	runsPerFile, err := strconv.Atoi(os.Args[2])
+	runsPerConfig, err := strconv.Atoi(os.Args[2])
 	if err != nil {
-		panic(fmt.Sprintf("Invalid runs_per_file: %v", err))
+		panic(fmt.Sprintf("Invalid runs_per_config: %v", err))
 	}
 	tspFiles := os.Args[3:]
 
-	// Записываем заголовок если нужно
 	if err := writeHeaderIfNeeded(outputFile); err != nil {
 		panic(err)
+	}
+
+	// Define experiment configurations
+	configs := []ExperimentConfig{
+		{
+			Name:              "best_uniform_noopt",
+			LocalOptimization: optimisation.NewNoOpLocalOptimisation(),
+			SelectionStrategy: selection.NewBestSelectionStrategy(),
+			MutationStrategy:  mutation.NewUniformMutationStrategy(-0.2, 0.2),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
+		{
+			Name:              "best_uniform_2opt",
+			LocalOptimization: optimisation.NewTwoOptLocalOptimisation(),
+			SelectionStrategy: selection.NewBestSelectionStrategy(),
+			MutationStrategy:  mutation.NewUniformMutationStrategy(-0.2, 0.2),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
+		{
+			Name:              "best_gauss_noopt",
+			LocalOptimization: optimisation.NewNoOpLocalOptimisation(),
+			SelectionStrategy: selection.NewBestSelectionStrategy(),
+			MutationStrategy:  mutation.NewGaussMutationStrategy(0.2, 0),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
+		{
+			Name:              "best_gauss_2opt",
+			LocalOptimization: optimisation.NewTwoOptLocalOptimisation(),
+			SelectionStrategy: selection.NewBestSelectionStrategy(),
+			MutationStrategy:  mutation.NewGaussMutationStrategy(0.2, 0),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
+		{
+			Name:              "tournament_uniform_noopt",
+			LocalOptimization: optimisation.NewNoOpLocalOptimisation(),
+			SelectionStrategy: selection.NewTournamentSelectionStrategy(3),
+			MutationStrategy:  mutation.NewUniformMutationStrategy(-0.2, 0.2),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
+		{
+			Name:              "tournament_uniform_2opt",
+			LocalOptimization: optimisation.NewTwoOptLocalOptimisation(),
+			SelectionStrategy: selection.NewTournamentSelectionStrategy(3),
+			MutationStrategy:  mutation.NewUniformMutationStrategy(-0.2, 0.2),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
+		{
+			Name:              "tournament_gauss_noopt",
+			LocalOptimization: optimisation.NewNoOpLocalOptimisation(),
+			SelectionStrategy: selection.NewTournamentSelectionStrategy(3),
+			MutationStrategy:  mutation.NewGaussMutationStrategy(0.2, 0),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
+		{
+			Name:              "tournament_gauss_2opt",
+			LocalOptimization: optimisation.NewTwoOptLocalOptimisation(),
+			SelectionStrategy: selection.NewTournamentSelectionStrategy(3),
+			MutationStrategy:  mutation.NewGaussMutationStrategy(0.2, 0),
+			CrossoverStrategy: crossover.NewAriphmeticCrossoverStrategy(),
+		},
 	}
 
 	// Process each file sequentially
@@ -138,63 +207,70 @@ func main() {
 			continue
 		}
 
-		for run := 1; run <= runsPerFile; run++ {
-			fmt.Printf("[HACO] %s - Run %d/%d\n", file, run, runsPerFile)
+		// Run each configuration
+		for configIdx, config := range configs {
+			fmt.Printf("[HACO] %s - Config %d/%d: %s\n", file, configIdx+1, len(configs), config.Name)
 
-			// Memory measurement before
-			var memStats runtime.MemStats
-			runtime.GC()
-			runtime.ReadMemStats(&memStats)
-			memBefore := memStats.Alloc
+			for run := 1; run <= runsPerConfig; run++ {
+				fmt.Printf("[HACO] %s - %s - Run %d/%d\n", file, config.Name, run, runsPerConfig)
 
-			start := time.Now()
+				// Memory measurement before
+				var memStats runtime.MemStats
+				runtime.GC()
+				runtime.ReadMemStats(&memStats)
+				memBefore := memStats.Alloc
 
-			// Configure HACO
-			haco, err := colony.NewHeteroAntColony(
-				colony.WithDefaultAlpha(2),
-				colony.WithDefaultBeta(1.8),
-				colony.WithEvaporationRate(0.5),
-				colony.WithInitialPheromone(1),
-				colony.WithPheromoneMultiplier(4),
-				colony.WithColonySize(400),
-				colony.WithGenerationCount(400),
-				colony.WithGenerationPeriod(10),
-				colony.WithParentCount(20),
-				colony.WithPathChoiceStrategy(path.NewPahtClassicStrategy()),
-				colony.WithPheromoneApplyingStrategy(apply.NewApplyClassicStrategy()),
-				colony.WithCrossoverStrategy(crossover.NewAriphmeticCrossoverStrategy()),
-				colony.WithMutationStrategy(mutation.NewUniformMutationStrategy(-0.2, 0.2)),
-				colony.WithParentSelectionStrategy(selection.NewBestSelectionStrategy()),
-			)
+				start := time.Now()
 
-			if err != nil {
-				fmt.Printf("Error creating HACO for %s: %v\n", file, err)
-				continue
-			}
+				// Build colony options
+				options := []colony.HeteroAntColonyOption{
+					colony.WithDefaultAlpha(1),
+					colony.WithDefaultBeta(1),
+					colony.WithEvaporationRate(0.2),
+					colony.WithInitialPheromone(1),
+					colony.WithPheromoneMultiplier(2),
+					colony.WithColonySize(300),
+					colony.WithGenerationCount(300),
+					colony.WithGenerationPeriod(10),
+					colony.WithParentCount(20),
+					colony.WithPathChoiceStrategy(path.NewPahtClassicStrategy()),
+					colony.WithPheromoneApplyingStrategy(apply.NewApplyClassicStrategy()),
+					colony.WithLocalOptimisationStrategy(config.LocalOptimization),
+					colony.WithCrossoverStrategy(config.CrossoverStrategy),
+					colony.WithMutationStrategy(config.MutationStrategy),
+					colony.WithParentSelectionStrategy(config.SelectionStrategy),
+				}
 
-			haco.Prepare(g)
-			haco.Run()
+				haco, err := colony.NewHeteroAntColony(options...)
+				if err != nil {
+					fmt.Printf("Error creating HACO for %s config %s: %v\n", file, config.Name, err)
+					continue
+				}
 
-			// Memory measurement after
-			runtime.ReadMemStats(&memStats)
-			memAfter := memStats.Alloc
-			memoryUsed := memAfter - memBefore
-			memoryKB := memoryUsed / 1024
+				haco.Prepare(g)
+				haco.Run()
 
-			duration := time.Since(start)
+				// Memory measurement after
+				runtime.ReadMemStats(&memStats)
+				memAfter := memStats.Alloc
+				memoryUsed := memAfter - memBefore
+				memoryKB := memoryUsed / 1024
 
-			// Write result to CSV with file locking
-			record := []string{
-				file,
-				"haco",
-				fmt.Sprintf("%d", run),
-				fmt.Sprintf("%f", haco.Score()),
-				fmt.Sprintf("%d", duration.Milliseconds()),
-				fmt.Sprintf("%d", memoryKB),
-			}
+				duration := time.Since(start)
 
-			if err := writeResultWithLock(outputFile, record); err != nil {
-				fmt.Printf("Error writing record: %v\n", err)
+				// Write result to CSV
+				record := []string{
+					file,
+					config.Name,
+					fmt.Sprintf("%d", run),
+					fmt.Sprintf("%f", haco.Score()),
+					fmt.Sprintf("%d", duration.Milliseconds()),
+					fmt.Sprintf("%d", memoryKB),
+				}
+
+				if err := writeResultWithLock(outputFile, record); err != nil {
+					fmt.Printf("Error writing record: %v\n", err)
+				}
 			}
 		}
 	}

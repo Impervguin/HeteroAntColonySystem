@@ -138,9 +138,9 @@ func main() {
 			antColony, err := aco.NewAntColony(g,
 				aco.WithAlpha(2),
 				aco.WithBeta(1.8),
-				aco.WithEvaporationRate(0.5),
+				aco.WithEvaporationRate(0.2),
 				aco.WithInitialPheromone(1),
-				aco.WithPheromoneMultiplier(4),
+				aco.WithPheromoneMultiplier(2),
 				aco.WithColonySize(500),
 				aco.WithGenerationCount(500),
 			)
