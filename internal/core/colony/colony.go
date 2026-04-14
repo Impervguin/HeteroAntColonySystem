@@ -16,11 +16,12 @@ import (
 // setup of algorithm parameters and strategies.
 type HeteroAntColony struct {
 	// Configuration (immutable after creation)
-	pathChoice     ant.PathChoiceStrategy
-	pheromoneApply ant.PheromoneApplyingStrategy
-	parentSelect   ParentSelectionStrategy
-	crossover      CrossoverStrategy
-	mutation       MutationStrategy
+	pathChoice        ant.PathChoiceStrategy
+	pheromoneApply    ant.PheromoneApplyingStrategy
+	localOptimisation ant.LocalOptimisationStrategy
+	parentSelect      ParentSelectionStrategy
+	crossover         CrossoverStrategy
+	mutation          MutationStrategy
 
 	defaultAlpha        float64
 	defaultBeta         float64
@@ -50,6 +51,7 @@ func NewHeteroAntColony(opts ...HeteroAntColonyOption) (*HeteroAntColony, error)
 	cfg := &ColonyConfig{
 		PathChoice:          nil,
 		PheromoneApply:      nil,
+		LocalOptimisation:   nil,
 		DefaultAlpha:        DefaultAlpha,
 		DefaultBeta:         DefaultBeta,
 		PheromoneMultiplier: DefaultPheromoneMult,
@@ -70,6 +72,9 @@ func NewHeteroAntColony(opts ...HeteroAntColonyOption) (*HeteroAntColony, error)
 	}
 	if cfg.PheromoneApply == nil {
 		return nil, errors.ErrPheromoneApplyStrategyNotSet
+	}
+	if cfg.LocalOptimisation == nil {
+		return nil, errors.ErrLocalOptimisationStrategyNotSet
 	}
 
 	// Validate parameters
@@ -93,6 +98,7 @@ func NewHeteroAntColony(opts ...HeteroAntColonyOption) (*HeteroAntColony, error)
 	return &HeteroAntColony{
 		pathChoice:          cfg.PathChoice,
 		pheromoneApply:      cfg.PheromoneApply,
+		localOptimisation:   cfg.LocalOptimisation,
 		parentSelect:        cfg.ParentSelect,
 		crossover:           cfg.Crossover,
 		mutation:            cfg.Mutation,
@@ -147,14 +153,34 @@ func (c *HeteroAntColony) Run() error {
 			}
 		}
 
+		// Phase 2: Parent selection (if needed)
+
+		var parents []ant.AntView
+		if gen%c.generationPeriod == 0 {
+			views := make([]ant.AntView, 0, len(c.ants))
+			for _, ant := range c.ants {
+				views = append(views, ant)
+			}
+			parents = c.parentSelect.SelectParents(views, c.parentCount)
+
+			// Local optimisation of parents
+			for _, p := range parents {
+				a, _ := p.(*ant.HeteroAnt)
+				if err := a.LocalOptimisation(c.localOptimisation); err != nil {
+					return err
+				}
+			}
+		}
+
 		// Phase 2: Find best ant in this generation
+		// Parents are in the same generation as ants
+		// and have already been optimised so it counts here
 		bestInGen := c.ants[0]
 		for _, a := range c.ants {
 			if a.Score() < bestInGen.Score() {
 				bestInGen = a
 			}
 		}
-		// fmt.Println(bestInGen.Alpha(), bestInGen.Beta(), bestInGen.Score())
 
 		// Update global best if needed
 		if c.best == nil || bestInGen.Score() < c.best.Score() {
@@ -172,8 +198,10 @@ func (c *HeteroAntColony) Run() error {
 		}
 
 		// Phase 5: Prepare next generation (reuse ant objects with same config)
-		if gen%c.generationPeriod == 0 {
-			c.prepareNextGeneration()
+		// same, parents are in the same generation as ants
+		// and have already been optimised so it counts here
+		if parents != nil {
+			c.prepareNextGeneration(parents)
 		}
 	}
 
@@ -195,15 +223,7 @@ func (c *HeteroAntColony) evaporatePheromones() {
 }
 
 // prepareNextGeneration creates new ants based on selection, crossover, and mutation.
-func (c *HeteroAntColony) prepareNextGeneration() {
-
-	// Select parents
-	views := make([]ant.AntView, 0, len(c.ants))
-	for _, ant := range c.ants {
-		views = append(views, ant)
-	}
-	parents := c.parentSelect.SelectParents(views, c.parentCount)
-
+func (c *HeteroAntColony) prepareNextGeneration(parents []ant.AntView) {
 	// Crossover
 	offspring := make([]*ant.HeteroAnt, 0, c.colonySize)
 	for i := 0; uint(i) < c.colonySize; i++ {

@@ -12,11 +12,12 @@ type HeteroAntColonyOption func(colony *ColonyConfig)
 // ColonyConfig holds the configuration parameters for a heterogeneous ant colony.
 // This is used with functional options to configure the colony.
 type ColonyConfig struct {
-	PathChoice     ant.PathChoiceStrategy
-	PheromoneApply ant.PheromoneApplyingStrategy
-	ParentSelect   ParentSelectionStrategy
-	Crossover      CrossoverStrategy
-	Mutation       MutationStrategy
+	PathChoice        ant.PathChoiceStrategy
+	PheromoneApply    ant.PheromoneApplyingStrategy
+	LocalOptimisation ant.LocalOptimisationStrategy
+	ParentSelect      ParentSelectionStrategy
+	Crossover         CrossoverStrategy
+	Mutation          MutationStrategy
 
 	DefaultAlpha        float64
 	DefaultBeta         float64
@@ -116,6 +117,12 @@ func WithPathChoiceStrategy(choice ant.PathChoiceStrategy) HeteroAntColonyOption
 func WithPheromoneApplyingStrategy(apply ant.PheromoneApplyingStrategy) HeteroAntColonyOption {
 	return func(colony *ColonyConfig) {
 		colony.PheromoneApply = apply
+	}
+}
+
+func WithLocalOptimisationStrategy(local ant.LocalOptimisationStrategy) HeteroAntColonyOption {
+	return func(colony *ColonyConfig) {
+		colony.LocalOptimisation = local
 	}
 }
 

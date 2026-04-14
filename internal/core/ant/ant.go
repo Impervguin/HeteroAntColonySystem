@@ -191,6 +191,17 @@ func (a *HeteroAnt) Current() *graph.Vertex {
 	return a.current
 }
 
+func (a *HeteroAnt) LocalOptimisation(s LocalOptimisationStrategy) error {
+	if a.g == nil || !a.done {
+		return errors.ErrAntNotDone
+	}
+
+	s.Optimise(a.path, a.g)
+	a.calculateScore()
+
+	return nil
+}
+
 func (a *HeteroAnt) FullCopy() *HeteroAnt {
 	path := make([]*graph.Vertex, 0, len(a.path))
 	for _, v := range a.path {

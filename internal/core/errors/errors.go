@@ -16,6 +16,7 @@ var (
 	ErrEvaporationRateInvalid     = errors.New("evaporation rate must be greater than 0")
 	ErrInitialPheromoneInvalid    = errors.New("initial pheromone must be greater than 0")
 
-	ErrPathChoiceStrategyNotSet     = errors.New("path choice strategy not set")
-	ErrPheromoneApplyStrategyNotSet = errors.New("pheromone apply strategy not set")
+	ErrPathChoiceStrategyNotSet        = errors.New("path choice strategy not set")
+	ErrPheromoneApplyStrategyNotSet    = errors.New("pheromone apply strategy not set")
+	ErrLocalOptimisationStrategyNotSet = errors.New("local optimisation strategy not set")
 )
