@@ -224,8 +224,8 @@ func main() {
 
 				// Build colony options
 				options := []colony.HeteroAntColonyOption{
-					colony.WithDefaultAlpha(1),
-					colony.WithDefaultBeta(1),
+					colony.WithDefaultAlpha(2),
+					colony.WithDefaultBeta(1.8),
 					colony.WithEvaporationRate(0.2),
 					colony.WithInitialPheromone(1),
 					colony.WithPheromoneMultiplier(2),

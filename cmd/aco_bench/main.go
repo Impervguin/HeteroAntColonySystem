@@ -136,8 +136,8 @@ func main() {
 			start := time.Now()
 
 			antColony, err := aco.NewAntColony(g,
-				aco.WithAlpha(2),
-				aco.WithBeta(1.8),
+				aco.WithAlpha(1),
+				aco.WithBeta(1),
 				aco.WithEvaporationRate(0.2),
 				aco.WithInitialPheromone(1),
 				aco.WithPheromoneMultiplier(2),
