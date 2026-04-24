@@ -42,6 +42,9 @@ type HeteroAntColony struct {
 	// Best solution tracking
 	best  *ant.HeteroAnt
 	score float64
+
+	// Observers
+	observers []ColonyObserver
 }
 
 // NewHeteroAntColony creates a new heterogeneous ant colony with the given options.
@@ -59,6 +62,7 @@ func NewHeteroAntColony(opts ...HeteroAntColonyOption) (*HeteroAntColony, error)
 		InitialPheromone:    DefaultPheromone,
 		GenerationCount:     DefaultGenerations,
 		ColonySize:          DefaultColonySize,
+		Observers:           make([]ColonyObserver, 0),
 	}
 
 	// Apply user-provided options
@@ -111,6 +115,7 @@ func NewHeteroAntColony(opts ...HeteroAntColonyOption) (*HeteroAntColony, error)
 		colonySize:          cfg.ColonySize,
 		generationPeriod:    cfg.GenerationPeriod,
 		parentCount:         cfg.ParentCount,
+		observers:           cfg.Observers,
 	}, nil
 }
 
@@ -172,7 +177,7 @@ func (c *HeteroAntColony) Run() error {
 			}
 		}
 
-		// Phase 2: Find best ant in this generation
+		// Phase 3: Find best ant in this generation
 		// Parents are in the same generation as ants
 		// and have already been optimised so it counts here
 		bestInGen := c.ants[0]
@@ -187,17 +192,36 @@ func (c *HeteroAntColony) Run() error {
 			c.best = bestInGen.FullCopy()
 		}
 
-		// Phase 3: Evaporate pheromones
+		// Phase 4: Evaporate pheromones
 		c.evaporatePheromones()
 
-		// Phase 4: Apply pheromone updates
+		// Phase 5: Apply pheromone updates
 		for _, a := range c.ants {
 			if err := a.ApplyPheromone(); err != nil {
 				return err
 			}
 		}
 
-		// Phase 5: Prepare next generation (reuse ant objects with same config)
+		// Phase 6: Observe current state
+		aviews := make([]ant.AntView, 0, len(c.ants))
+		for _, ant := range c.ants {
+			aviews = append(aviews, ant)
+		}
+		dto := &ColonyObserverDTO{
+			C:          c,
+			Ants:       aviews,
+			Pm:         c.pm,
+			G:          c.g,
+			Best:       c.best,
+			Score:      c.score,
+			Generation: gen,
+		}
+
+		for _, obs := range c.observers {
+			obs.Observe(dto)
+		}
+
+		// Phase 7: Prepare next generation (reuse ant objects with same config)
 		// same, parents are in the same generation as ants
 		// and have already been optimised so it counts here
 		if parents != nil {

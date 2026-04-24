@@ -30,6 +30,8 @@ type ColonyConfig struct {
 
 	GenerationCount uint
 	ColonySize      uint
+
+	Observers []ColonyObserver
 }
 
 // Default configuration values.
@@ -144,5 +146,11 @@ func WithCrossoverStrategy(crossover CrossoverStrategy) HeteroAntColonyOption {
 func WithMutationStrategy(mutation MutationStrategy) HeteroAntColonyOption {
 	return func(colony *ColonyConfig) {
 		colony.Mutation = mutation
+	}
+}
+
+func WithColonyObserver(observer ColonyObserver) HeteroAntColonyOption {
+	return func(colony *ColonyConfig) {
+		colony.Observers = append(colony.Observers, observer)
 	}
 }
