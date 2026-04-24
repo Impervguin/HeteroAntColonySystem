@@ -81,14 +81,17 @@ func ParseNodes(r io.Reader, expectedDim int, minFields int) ([]Node, error) {
 	return nodes, nil
 }
 
+type MetadataFabric func(n Node) any
+
 // CreateVertices creates graph vertices from nodes
-func CreateVertices(nodes []Node) ([]*graph.Vertex, map[int]*graph.Vertex) {
+func CreateVertices(nodes []Node, mf MetadataFabric) ([]*graph.Vertex, map[int]*graph.Vertex) {
 	vertices := make([]*graph.Vertex, 0, len(nodes))
 	vertexMap := make(map[int]*graph.Vertex, len(nodes))
 
 	for _, n := range nodes {
 		name := strconv.Itoa(n.ID)
 		v := graph.NewVertex(name)
+		v.SetMetadata(mf(n))
 		vertices = append(vertices, v)
 		vertexMap[n.ID] = v
 	}

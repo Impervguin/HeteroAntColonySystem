@@ -22,13 +22,26 @@ func (a *Euclidean2DAdapter) CanHandle(weightType string, weightFormat string) b
 	return weightType == tsplib.WeightTypeEUC2D && weightFormat == tsplib.WeightFormatFUNCTION
 }
 
+type Euclidean2DMetadata struct {
+	X, Y float64
+}
+
+func (a *Euclidean2DAdapter) MetadataType() any {
+	return &Euclidean2DMetadata{}
+}
+
 func (a *Euclidean2DAdapter) Parse(r io.Reader, problem *tsplib.Problem) ([]*graph.Vertex, []*graph.Edge, error) {
 	nodes, err := ParseNodes(r, problem.Dimension, 3)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	vertices, vertexMap := CreateVertices(nodes)
+	vertices, vertexMap := CreateVertices(nodes, func(n Node) any {
+		return &Euclidean2DMetadata{
+			X: MustGetCoord(n, 0),
+			Y: MustGetCoord(n, 1),
+		}
+	})
 
 	edges := BuildCompleteGraph(nodes, vertexMap, func(n1, n2 Node) float64 {
 		x1 := MustGetCoord(n1, 0)

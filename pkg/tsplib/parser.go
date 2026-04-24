@@ -80,6 +80,9 @@ func (p *TSPLIBParser) buildGraph(problem *Problem, vertices []*graph.Vertex, ed
 		g.AddEdge(e.Weight(), e.Source(), e.Target())
 	}
 
+	adapter := p.registry.Get(problem.EdgeWeightType, problem.EdgeWeightFormat)
+	g.SetMetadataType(adapter.MetadataType())
+
 	return g
 }
 

@@ -23,13 +23,26 @@ func (a *GEOAdapter) CanHandle(weightType string, weightFormat string) bool {
 	return weightType == tsplib.WeightTypeGEO && weightFormat == tsplib.WeightFormatFUNCTION
 }
 
+type GEOMetadata struct {
+	Lat, Lon float64
+}
+
+func (a *GEOAdapter) MetadataType() any {
+	return &GEOMetadata{}
+}
+
 func (a *GEOAdapter) Parse(r io.Reader, problem *tsplib.Problem) ([]*graph.Vertex, []*graph.Edge, error) {
 	nodes, err := ParseNodes(r, problem.Dimension, 3)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	vertices, vertexMap := CreateVertices(nodes)
+	vertices, vertexMap := CreateVertices(nodes, func(n Node) any {
+		return &GEOMetadata{
+			Lat: MustGetCoord(n, 0),
+			Lon: MustGetCoord(n, 1),
+		}
+	})
 
 	edges := BuildCompleteGraph(nodes, vertexMap, func(n1, n2 Node) float64 {
 		lat1 := MustGetCoord(n1, 0)

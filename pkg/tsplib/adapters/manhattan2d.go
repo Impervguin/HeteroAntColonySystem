@@ -22,13 +22,26 @@ func (a *Manhattan2DAdapter) CanHandle(weightType string, weightFormat string) b
 	return weightType == tsplib.WeightTypeMAN2D && weightFormat == tsplib.WeightFormatFUNCTION
 }
 
+type Manhattan2DMetadata struct {
+	X, Y float64
+}
+
+func (a *Manhattan2DAdapter) MetadataType() any {
+	return &Manhattan2DMetadata{}
+}
+
 func (a *Manhattan2DAdapter) Parse(r io.Reader, problem *tsplib.Problem) ([]*graph.Vertex, []*graph.Edge, error) {
 	nodes, err := ParseNodes(r, problem.Dimension, 3)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	vertices, vertexMap := CreateVertices(nodes)
+	vertices, vertexMap := CreateVertices(nodes, func(n Node) any {
+		return &Manhattan2DMetadata{
+			X: MustGetCoord(n, 0),
+			Y: MustGetCoord(n, 1),
+		}
+	})
 
 	edges := BuildCompleteGraph(nodes, vertexMap, func(n1, n2 Node) float64 {
 		x1 := MustGetCoord(n1, 0)

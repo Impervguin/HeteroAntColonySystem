@@ -15,6 +15,9 @@ type TSPLIBAdapter interface {
 
 	// Name returns adapter name
 	Name() string
+
+	// MetadataType returns the type of metadata stored in the vertices
+	MetadataType() any
 }
 
 type AdapterRegistry interface {

@@ -1,7 +1,9 @@
 package graph
 
 import (
+	"fmt"
 	"math/rand"
+	"reflect"
 	"sync"
 )
 
@@ -13,6 +15,8 @@ type Graph struct {
 	// targetMap maps a vertex to all edges that have it as target
 	targetMap map[*Vertex][]*Edge
 	dist      map[*Vertex]map[*Vertex]*Edge
+
+	metadataType any
 
 	mut sync.RWMutex
 }
@@ -37,6 +41,16 @@ func (g *Graph) AddVertex(v *Vertex) error {
 	g.vertices[v] = struct{}{}
 	g.sourceMap[v] = make([]*Edge, 0)
 	g.targetMap[v] = make([]*Edge, 0)
+
+	if g.metadataType != nil {
+		// check same metadata type
+		if v.Metadata() == nil {
+			return fmt.Errorf("vertex %s has no metadata", v.Name())
+		}
+		if reflect.TypeOf(v.Metadata()) != reflect.TypeOf(g.metadataType) {
+			return fmt.Errorf("vertex %s has invalid metadata type", v.Name())
+		}
+	}
 	return nil
 }
 
@@ -213,7 +227,7 @@ func (g *Graph) RandomVertex() *Vertex {
 
 	vNum := rand.Intn(len(g.vertices))
 	counter := 0
-	for v, _ := range g.vertices {
+	for v := range g.vertices {
 		if counter == vNum {
 			return v
 		}
@@ -232,4 +246,12 @@ func (g *Graph) EdgeLen() int {
 	g.mut.RLock()
 	defer g.mut.RUnlock()
 	return len(g.edges)
+}
+
+func (g *Graph) MetadataType() any {
+	return g.metadataType
+}
+
+func (g *Graph) SetMetadataType(metadataType any) {
+	g.metadataType = metadataType
 }

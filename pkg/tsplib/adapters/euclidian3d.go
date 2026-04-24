@@ -23,13 +23,27 @@ func (a *Euclidean3DAdapter) CanHandle(weightType string, weightFormat string) b
 	return weightType == tsplib.WeightTypeEUC3D && weightFormat == tsplib.WeightFormatFUNCTION
 }
 
+type Euclidean3DMetadata struct {
+	X, Y, Z float64
+}
+
+func (a *Euclidean3DAdapter) MetadataType() any {
+	return &Euclidean3DMetadata{}
+}
+
 func (a *Euclidean3DAdapter) Parse(r io.Reader, problem *tsplib.Problem) ([]*graph.Vertex, []*graph.Edge, error) {
 	nodes, err := ParseNodes(r, problem.Dimension, 4)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	vertices, vertexMap := CreateVertices(nodes)
+	vertices, vertexMap := CreateVertices(nodes, func(n Node) any {
+		return &Euclidean3DMetadata{
+			X: MustGetCoord(n, 0),
+			Y: MustGetCoord(n, 1),
+			Z: MustGetCoord(n, 2),
+		}
+	})
 
 	edges := BuildCompleteGraph(nodes, vertexMap, func(n1, n2 Node) float64 {
 		x1 := MustGetCoord(n1, 0)
