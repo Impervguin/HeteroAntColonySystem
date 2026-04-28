@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// Server
-	engine := gin.New()
+	engine := gin.Default()
 	engine.Use(gin.Recovery())
 
 	// Infrastructure

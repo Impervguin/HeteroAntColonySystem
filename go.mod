@@ -3,6 +3,7 @@ module HeteroAntColonySystem
 go 1.25.7
 
 require (
+	github.com/a-h/templ v0.3.1001
 	github.com/gin-gonic/gin v1.12.0
 	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.11.1

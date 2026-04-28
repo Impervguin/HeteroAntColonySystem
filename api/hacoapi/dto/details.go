@@ -28,7 +28,7 @@ type pheromoneMap struct {
 type pheromoneItem struct {
 	SourceID  string  `json:"source_id"`
 	TargetID  string  `json:"target_id"`
-	Pheromone float64 `json:"weight"`
+	Pheromone float64 `json:"pheromone"`
 }
 
 type path struct {

@@ -1,0 +1,167 @@
+package templates
+
+import "encoding/json"
+
+type PageData struct {
+	APIBase string
+
+	// defaults
+	DefaultAlpha        float64
+	DefaultBeta         float64
+	PheromoneMultiplier float64
+	EvaporationRate     float64
+	InitialPheromone    float64
+
+	GenerationCount  uint
+	ColonySize       uint
+	GenerationPeriod uint
+	ParentCount      uint
+
+	// стратегии (простые дефолты)
+	SelectionType string
+	TournamentK  uint
+
+	CrossoverType string
+
+	MutationType string
+	MutationMin  float64
+	MutationMax  float64
+	MutationMean float64
+	MutationStd  float64
+
+	LocalOptimisation string
+}
+
+templ Page(d PageData) {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<title>HACO Visualizer</title>
+
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+</head>
+
+<body class="bg-neutral-900 text-neutral-100">
+
+<div class="max-w-7xl mx-auto p-6">
+
+	<!-- HEADER -->
+	<div class="mb-6">
+		<h1 class="text-3xl font-bold text-amber-400">🐜 HACO Visualizer</h1>
+		<p class="text-neutral-400">Ant Colony Optimization playground</p>
+	</div>
+
+	<!-- INPUT PANEL -->
+	<div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
+
+		<div class="grid grid-cols-4 gap-4">
+
+			<!-- FILE -->
+			<div class="col-span-4">
+				<label class="block text-sm text-neutral-400 mb-1">TSP file</label>
+				<input id="file-input" type="file"
+					class="w-full bg-neutral-700 p-2 rounded"/>
+			</div>
+
+			<!-- BASIC PARAMS -->
+			@input("default_alpha", "Alpha", d.DefaultAlpha)
+			@input("default_beta", "Beta", d.DefaultBeta)
+			@input("pheromone_multiplier", "Pheromone Mult", d.PheromoneMultiplier)
+			@input("evaporation_rate", "Evaporation", d.EvaporationRate)
+
+			@input("initial_pheromone", "Initial Pheromone", d.InitialPheromone)
+			@input("generation_count", "Generations", d.GenerationCount)
+			@input("colony_size", "Colony Size", d.ColonySize)
+			@input("generation_period", "Generation Period", d.GenerationPeriod)
+
+			@input("parent_count", "Parent Count", d.ParentCount)
+
+			<!-- SELECTION -->
+			<div>
+				<label class="block text-sm text-neutral-400 mb-1">Selection</label>
+				<select id="selection_type" class="w-full bg-neutral-700 p-2 rounded">
+					<option value="best" selected?={d.SelectionType == "best"}>Best</option>
+					<option value="tournament" selected?={d.SelectionType == "tournament"}>Tournament</option>
+				</select>
+			</div>
+
+			@input("tournament_k", "Tournament K", d.TournamentK)
+
+			<!-- MUTATION -->
+			<div>
+				<label class="block text-sm text-neutral-400 mb-1">Mutation</label>
+				<select id="mutation_type" class="w-full bg-neutral-700 p-2 rounded">
+					<option value="uniform" selected?={d.MutationType == "uniform"}>Uniform</option>
+					<option value="gauss" selected?={d.MutationType == "gauss"}>Gauss</option>
+				</select>
+			</div>
+
+			@input("mutation_min", "Min", d.MutationMin)
+			@input("mutation_max", "Max", d.MutationMax)
+			@input("mutation_mean", "Mean", d.MutationMean)
+			@input("mutation_std", "Std", d.MutationStd)
+
+			<!-- LOCAL OPT -->
+			<div>
+				<label class="block text-sm text-neutral-400 mb-1">Local Optimisation</label>
+				<select id="local_optimisation" class="w-full bg-neutral-700 p-2 rounded">
+					<option value="noop" selected?={d.LocalOptimisation == "noop"}>No-op</option>
+					<option value="2opt" selected?={d.LocalOptimisation == "2opt"}>2-opt</option>
+				</select>
+			</div>
+
+			<!-- RUN BUTTON -->
+			<div class="col-span-4 mt-4">
+				<button id="run-btn"
+					class="w-full bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 rounded">
+					Run HACO
+				</button>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- GRAPHS -->
+
+	@panel("Graph", "graph")
+	@panel("Pheromones (edges)", "pheromone-graph")
+	@panel("Heatmap", "heatmap")
+	@panel("Alpha / Beta", "coeffs")
+	@panel("Best Path Score", "score")
+
+</div>
+
+<!-- CONFIG FROM BACKEND -->
+<script>
+window.APP_CONFIG = {
+	apiBase: "{{ d.APIBase }}",
+}
+</script>
+
+<!-- APP -->
+<script type="module" src="/static/js/app.js"></script>
+
+
+</body>
+</html>
+}
+
+templ input(name string, label string, value any) {
+	<div>
+		<label class="block text-sm text-neutral-400 mb-1">{label}</label>
+		<input
+			id={name}
+			value={fmt.Sprintf("%v", value)}
+			class="w-full bg-neutral-700 p-2 rounded"
+		/>
+	</div>
+}
+
+templ panel(title string, id string) {
+	<div class="bg-neutral-800 rounded-xl p-4 mb-6 shadow">
+		<h2 class="text-lg font-semibold mb-2 text-amber-300">{title}</h2>
+		<div id={id} class="h-[400px]"></div>
+	</div>
+}
