@@ -20,12 +20,18 @@ func NewUniformMutationStrategy(l, r float64) *UniformMutationStrategy {
 }
 
 func (s *UniformMutationStrategy) Mutate(a ant.AntView) *ant.HeteroAnt {
-	alpha := s.l + rand.Float64()*(s.r-s.l)
-	beta := s.l + rand.Float64()*(s.r-s.l)
+	alpha := a.Alpha() + s.l + rand.Float64()*(s.r-s.l)
+	beta := a.Beta() + s.l + rand.Float64()*(s.r-s.l)
+	if alpha < 0 {
+		alpha = 0
+	}
+	if beta < 0 {
+		beta = 0
+	}
 
 	return ant.NewHeteroAnt(
-		a.Alpha()+alpha,
-		a.Beta()+beta,
+		alpha,
+		beta,
 		a.PheromoneMultiplier(),
 		a.PathStrategy(),
 		a.PheromoneApplyStrategy(),

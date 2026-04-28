@@ -1,6 +1,7 @@
 package main
 
 import (
+	"HeteroAntColonySystem/api/hacoapi"
 	"HeteroAntColonySystem/api/tspapi"
 	"HeteroAntColonySystem/pkg/tsplib"
 	"HeteroAntColonySystem/pkg/tsplib/adapters"
@@ -27,6 +28,9 @@ func main() {
 
 	tspRouter := tspapi.NewRouter(apiGroup, parser, fs)
 	_ = tspRouter
+
+	hacoRouter := hacoapi.NewRouter(apiGroup)
+	_ = hacoRouter
 
 	// Start server
 	engine.Run(":8080")

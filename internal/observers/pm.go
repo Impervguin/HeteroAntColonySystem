@@ -10,6 +10,12 @@ type PheromoneMapObserver struct {
 	pheromoneMaps map[uint]*pheromone.PheromoneMap
 }
 
+func NewPheromoneMapObserver() *PheromoneMapObserver {
+	return &PheromoneMapObserver{
+		pheromoneMaps: make(map[uint]*pheromone.PheromoneMap),
+	}
+}
+
 var _ colony.ColonyObserver = (*PheromoneMapObserver)(nil)
 
 func (o *PheromoneMapObserver) Observe(dto *colony.ColonyObserverDTO) {

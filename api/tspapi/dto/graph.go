@@ -6,8 +6,9 @@ import (
 )
 
 type graphJson struct {
-	Nodes []graphNode `json:"nodes"`
-	Edges []graphEdge `json:"edges"`
+	Nodes        []graphNode `json:"nodes"`
+	Edges        []graphEdge `json:"edges"`
+	MetadataType string      `json:"metadata_type"`
 }
 
 type graphNode struct {
@@ -45,8 +46,9 @@ func mapGraph(g *graph.Graph) *graphJson {
 	})
 
 	return &graphJson{
-		Nodes: nodes,
-		Edges: edges,
+		Nodes:        nodes,
+		Edges:        edges,
+		MetadataType: mapMetadataType(g.MetadataType()),
 	}
 }
 
@@ -78,5 +80,20 @@ func mapMetadata(metadata any) map[string]any {
 		}
 	default:
 		return nil
+	}
+}
+
+func mapMetadataType(metadataType any) string {
+	switch metadataType.(type) {
+	case *adapters.Manhattan2DMetadata:
+		return "manhattan_2d"
+	case *adapters.Euclidean2DMetadata:
+		return "euclidean_2d"
+	case *adapters.GEOMetadata:
+		return "geo"
+	case *adapters.Euclidean3DMetadata:
+		return "euclidean_3d"
+	default:
+		return ""
 	}
 }

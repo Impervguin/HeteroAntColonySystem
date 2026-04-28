@@ -30,7 +30,7 @@ func (s *TournamentSelectionStrategy) SelectParents(ants []ant.AntView, n uint) 
 
 		best := samples[0]
 		for _, ant := range samples {
-			if ant.Score() > best.Score() {
+			if ant.Score() < best.Score() {
 				best = ant
 			}
 		}

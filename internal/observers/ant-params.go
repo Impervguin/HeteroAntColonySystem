@@ -11,6 +11,12 @@ type AntParamsObserver struct {
 	m map[uint]mapElement
 }
 
+func NewAntParamsObserver() *AntParamsObserver {
+	return &AntParamsObserver{
+		m: make(map[uint]mapElement),
+	}
+}
+
 var _ colony.ColonyObserver = (*AntParamsObserver)(nil)
 
 func (o *AntParamsObserver) Observe(dto *colony.ColonyObserverDTO) {
