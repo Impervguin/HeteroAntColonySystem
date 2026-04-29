@@ -28,32 +28,36 @@ let currentFilename: string | null = null
 
 const elements = {
   fileInput: document.getElementById("file-input") as HTMLInputElement,
+  graphSelect: document.getElementById("graph-select") as HTMLSelectElement,
   runBtn: document.getElementById("run-btn") as HTMLButtonElement,
   
   // Basic params
-  defaultAlpha: document.getElementById("default_alpha") as HTMLInputElement,
-  defaultBeta: document.getElementById("default_beta") as HTMLInputElement,
-  pheromoneMultiplier: document.getElementById("pheromone_multiplier") as HTMLInputElement,
-  evaporationRate: document.getElementById("evaporation_rate") as HTMLInputElement,
-  initialPheromone: document.getElementById("initial_pheromone") as HTMLInputElement,
-  generationCount: document.getElementById("generation_count") as HTMLInputElement,
-  colonySize: document.getElementById("colony_size") as HTMLInputElement,
-  generationPeriod: document.getElementById("generation_period") as HTMLInputElement,
-  parentCount: document.getElementById("parent_count") as HTMLInputElement,
+  defaultAlpha: document.getElementById("default-alpha") as HTMLInputElement,
+  defaultBeta: document.getElementById("default-beta") as HTMLInputElement,
+  pheromoneMultiplier: document.getElementById("pheromone-multiplier") as HTMLInputElement,
+  evaporationRate: document.getElementById("evaporation-rate") as HTMLInputElement,
+  initialPheromone: document.getElementById("initial-pheromone") as HTMLInputElement,
+  generationCount: document.getElementById("generation-count") as HTMLInputElement,
+  colonySize: document.getElementById("colony-size") as HTMLInputElement,
+  generationPeriod: document.getElementById("generation-period") as HTMLInputElement,
+  parentCount: document.getElementById("parent-count") as HTMLInputElement,
   
   // Selection
-  selectionType: document.getElementById("selection_type") as HTMLSelectElement,
-  tournamentK: document.getElementById("tournament_k") as HTMLInputElement,
+  selectionType: document.getElementById("selection-type") as HTMLSelectElement,
+  tournamentK: document.getElementById("tournament-k") as HTMLInputElement,
   
   // Mutation
-  mutationType: document.getElementById("mutation_type") as HTMLSelectElement,
-  mutationMin: document.getElementById("mutation_min") as HTMLInputElement,
-  mutationMax: document.getElementById("mutation_max") as HTMLInputElement,
-  mutationMean: document.getElementById("mutation_mean") as HTMLInputElement,
-  mutationStd: document.getElementById("mutation_std") as HTMLInputElement,
+  mutationType: document.getElementById("mutation-type") as HTMLSelectElement,
+  mutationMin: document.getElementById("mutation-min") as HTMLInputElement,
+  mutationMax: document.getElementById("mutation-max") as HTMLInputElement,
+  mutationMean: document.getElementById("mutation-mean") as HTMLInputElement,
+  mutationStd: document.getElementById("mutation-std") as HTMLInputElement,
   
+  // Crossover
+  crossoverType: document.getElementById("crossover-type") as HTMLSelectElement,
+
   // Local optimisation
-  localOptimisation: document.getElementById("local_optimisation") as HTMLSelectElement,
+  localOptimisation: document.getElementById("local-optimisation") as HTMLSelectElement,
 }
 
 // =======================
@@ -92,7 +96,7 @@ function getFormInput(): HacoFormInput | null {
         ? parseInt(elements.tournamentK.value, 10)
         : undefined,
       
-      crossover_type: "arithmetic",
+      crossover_type: elements.crossoverType.value as "arithmetic",
       
       mutation_type: mutationType as "uniform" | "gauss",
       mutation_min: mutationType === "uniform"
@@ -141,6 +145,35 @@ async function handleFileUpload(file: File) {
     Plotly.newPlot("coeffs", [], {})
     Plotly.newPlot("score", [], {})
     
+    console.log(`File loaded successfully: ${currentGraph.nodes.length} nodes, ${currentGraph.edges.length} edges`)
+  } catch (error) {
+    showError(`Failed to load TSP file: ${error}`)
+    currentGraph = null
+  }
+}
+
+async function handleFileChoose(file: string) {
+  try {
+    console.log(`Getting file: ${file}`)
+    const response = await getTSP(file)
+    
+    if (!response.graph) {
+      throw new Error("No graph data received")
+    }
+    
+    currentGraph = response.graph
+    currentFilename = file
+    currentResult = null
+    
+    // Render initial graph without path
+    renderGraph(currentGraph)
+    
+    // Clear other plots
+    Plotly.newPlot("pheromone-graph", [], {})
+    Plotly.newPlot("heatmap", [], {})
+    Plotly.newPlot("coeffs", [], {})
+    Plotly.newPlot("score", [], {})
+
     console.log(`File loaded successfully: ${currentGraph.nodes.length} nodes, ${currentGraph.edges.length} edges`)
   } catch (error) {
     showError(`Failed to load TSP file: ${error}`)
@@ -219,6 +252,13 @@ function setupEventListeners() {
     const file = (e.target as HTMLInputElement).files?.[0]
     if (file) {
       await handleFileUpload(file)
+    }
+  })
+
+  elements.graphSelect.addEventListener("change", async (e) => {
+    const file = elements.graphSelect.selectedOptions[0]
+    if (file) {
+      await handleFileChoose(file.value)
     }
   })
   

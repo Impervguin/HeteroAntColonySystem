@@ -24,6 +24,7 @@ func NewRouter(r *gin.RouterGroup, parser *tsplib.TSPLIBParser, fs fs.FS) *TSPRo
 	gr := r.Group("/tsp")
 
 	gr.GET("/:file", tsp.GetTSP)
+	gr.GET("/files", tsp.ListTSP)
 	gr.POST("/parse", tsp.ParseTSP)
 
 	return tsp
@@ -98,4 +99,21 @@ func (r *TSPRouter) ParseTSP(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SerializeParseTSPResponse(c, g))
+}
+
+func (r *TSPRouter) ListTSP(c *gin.Context) {
+	files, err := fs.ReadDir(r.fs, ".")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ginerr.ErrJSONBody(err))
+		return
+	}
+
+	fnames := make([]string, 0, len(files))
+	for _, f := range files {
+		if f.Type().IsRegular() && len(f.Name()) > 4 && f.Name()[len(f.Name())-4:] == ".tsp" {
+			fnames = append(fnames, f.Name())
+		}
+	}
+
+	c.JSON(http.StatusOK, dto.SerializeListTSPResponse(c, fnames))
 }

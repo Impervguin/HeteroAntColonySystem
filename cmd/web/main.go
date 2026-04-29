@@ -9,7 +9,7 @@ import (
 func main() {
 	r := gin.Default()
 
-	router.Setup(r)
+	router.Setup(r, "localhost:8080", "/api/v1")
 
 	r.Run(":3000")
 }

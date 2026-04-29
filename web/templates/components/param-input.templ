@@ -1,0 +1,37 @@
+package components
+
+type ParamsBlockData struct {
+    DefaultAlpha float64
+    DefaultBeta float64
+    PheromoneMultiplier float64
+    EvaporationRate float64
+    InitialPheromone float64
+    GenerationCount uint
+    ColonySize uint
+    GenerationPeriod uint
+    ParentCount uint
+}
+
+templ ParamsBlock(d ParamsBlockData) {
+<div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
+
+	<h2 class="text-xl font-semibold mb-4 text-amber-300">Parameters</h2>
+
+	<div class="grid grid-cols-4 gap-4">
+
+		@input("default-alpha", "Alpha", d.DefaultAlpha)
+		@input("default-beta", "Beta", d.DefaultBeta)
+		@input("pheromone-multiplier", "Pheromone Mult", d.PheromoneMultiplier)
+		@input("evaporation-rate", "Evaporation", d.EvaporationRate)
+
+		@input("initial-pheromone", "Initial Pheromone", d.InitialPheromone)
+		@input("generation-count", "Generations", d.GenerationCount)
+		@input("colony-size", "Colony Size", d.ColonySize)
+		@input("generation-period", "Generation Period", d.GenerationPeriod)
+
+		@input("parent-count", "Parent Count", d.ParentCount)
+
+	</div>
+</div>
+}
+

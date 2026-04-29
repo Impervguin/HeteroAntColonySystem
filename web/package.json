@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "build": "tsc && esbuild ts/app.ts --bundle --minify --outdir=static/js --platform=browser --format=esm --inject:./ts/shims/reflect-shim.js"
+        "build": "tsc && esbuild ts/app.ts ts/ui.ts --bundle --minify --outdir=static/js --platform=browser --format=esm --inject:./ts/shims/reflect-shim.js"
     },
     "devDependencies": {
         "esbuild": "^0.28.0",

@@ -1,0 +1,79 @@
+package components
+
+
+type StrategyBlockData struct {
+	SelectionType string
+	TournamentK uint
+
+	MutationType string
+	MutationMin float64
+	MutationMax float64
+	MutationMean float64
+	MutationStd float64
+
+	LocalOptimisation string
+}
+
+templ StrategiesBlock(d StrategyBlockData) {
+<div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
+
+	<h2 class="text-xl font-semibold mb-4 text-amber-300">Strategies</h2>
+
+	<div class="grid grid-cols-4 gap-4">
+
+		<!-- SELECTION -->
+		<div class="gap-4">
+			<label>Selection</label>
+			<select id="selection-type" class="w-full bg-neutral-700 p-2 rounded">
+				<option value="best">Best</option>
+				<option value="tournament">Tournament</option>
+			</select>
+
+            <div id="selection-tournament" class="hidden">
+                @input("tournament-k", "Tournament K", d.TournamentK)
+            </div>
+		</div>
+
+		
+
+		<!-- MUTATION -->
+		<div>
+			<label>Mutation</label>
+			<select id="mutation-type" class="w-full bg-neutral-700 p-2 rounded">
+				<option value="uniform">Uniform</option>
+				<option value="gauss">Gauss</option>
+			</select>
+
+            <div id="mutation-uniform" class="hidden">
+                @input("mutation-min", "Min", d.MutationMin)
+                @input("mutation-max", "Max", d.MutationMax)
+            </div>
+
+            <div id="mutation-gauss" class="hidden">
+                @input("mutation-mean", "Mean", d.MutationMean)
+                @input("mutation-std", "Std", d.MutationStd)
+            </div>
+		</div>
+
+
+        <!-- Crossover -->
+        <div>
+            <label>Crossover</label>
+            <select id="crossover-type" class="w-full bg-neutral-700 p-2 rounded">
+                <option value="arithmetic">Arithmetic</option>
+            </select>
+        </div>
+
+
+		<!-- LOCAL OPT -->
+		<div>
+			<label>Local Optimisation</label>
+			<select id="local-optimisation" class="w-full bg-neutral-700 p-2 rounded">
+				<option value="noop">No-op</option>
+				<option value="2opt">2-opt</option>
+			</select>
+		</div>
+
+	</div>
+</div>
+}

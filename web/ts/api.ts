@@ -1,6 +1,6 @@
 import { validateDto } from "./utils/validate.js"
 
-import { ParseTSPResponse, GetTSPResponse } from "./models/tsp.js"
+import { ParseTSPResponse, GetTSPResponse, ListTSPResponse } from "./models/tsp.js"
 import { HacoRunRequest } from "./models/haco/request.js"
 import { HacoRunDetailsResponse } from "./models/haco/response.js"
 
@@ -33,6 +33,11 @@ export async function parseTSP(file: File): Promise<ParseTSPResponse> {
 export async function getTSP(filename: string): Promise<GetTSPResponse> {
   const res = await fetch(`${getApiBase()}/tsp/${encodeURIComponent(filename)}`)
   return validateDto(GetTSPResponse, await safeJson(res))
+}
+
+export async function listTSP(): Promise<ListTSPResponse> {
+  const res = await fetch(`${getApiBase()}/tsp/files`)
+  return validateDto(ListTSPResponse, await safeJson(res))
 }
 
 export async function runHacoDetails(request: HacoRunRequest): Promise<HacoRunDetailsResponse> {

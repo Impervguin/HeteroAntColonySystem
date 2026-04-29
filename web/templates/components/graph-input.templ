@@ -1,0 +1,35 @@
+package components
+
+templ GraphInput(files []string) {
+<div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
+
+	<h2 class="text-xl font-semibold mb-4 text-amber-300">Graph</h2>
+
+	<div class="grid grid-cols-2 gap-4">
+
+		<!-- MODE -->
+		<div class="col-span-2">
+			<select id="graph-mode" class="w-full bg-neutral-700 p-2 rounded">
+				<option value="file">Upload file</option>
+				<option value="existing">From server</option>
+			</select>
+		</div>
+
+		<!-- FILE INPUT -->
+		<div id="graph-file-block" class="col-span-2">
+			<input id="file-input" type="file"
+				class="w-full bg-neutral-700 p-2 rounded"/>
+		</div>
+
+		<!-- EXISTING -->
+		<div id="graph-existing-block" class="col-span-2 hidden">
+			<select id="graph-select" class="w-full bg-neutral-700 p-2 rounded">
+			    for _, f := range files {
+			        <option>{f}</option>
+			    }
+			</select>
+		</div>
+
+	</div>
+</div>
+}

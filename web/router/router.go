@@ -6,61 +6,84 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"HeteroAntColonySystem/api/utils/ginerr"
 	"HeteroAntColonySystem/web/templates"
 )
 
-func Setup(r *gin.Engine) {
-	r.GET("/", func(c *gin.Context) {
-		templates.Page(
-			templates.PageData{
-				APIBase: "/api/v1",
+type Router struct {
+	apiServer string
+	apiBase   string
+}
 
-				// defaults
-				DefaultAlpha:        1,
-				DefaultBeta:         1,
-				PheromoneMultiplier: 2500,
-				EvaporationRate:     0.01,
-				InitialPheromone:    2500,
-
-				GenerationCount:  100,
-				ColonySize:       10,
-				GenerationPeriod: 10,
-				ParentCount:      10,
-
-				// стратегии (простые дефолты)
-				SelectionType: "best",
-				TournamentK:   3,
-
-				CrossoverType: "arithmetic",
-
-				MutationType: "uniform",
-				MutationMin:  -0.2,
-				MutationMax:  0.2,
-				MutationMean: 0,
-				MutationStd:  0.3,
-
-				LocalOptimisation: "noop",
-			},
-		).Render(c.Request.Context(), c.Writer)
-	})
+func Setup(r *gin.Engine, apiServer, apiBase string) {
+	router := &Router{
+		apiServer: apiServer,
+		apiBase:   apiBase,
+	}
+	gr := r.Group("/view")
+	gr.GET("/", router.Get)
 
 	r.Static("/static", "./web/static")
 
-	r.GET("/api/v1/*action", func(c *gin.Context) {
+	r.GET(apiBase+"/*action", func(c *gin.Context) {
 		director := func(req *http.Request) {
 			req.URL.Scheme = "http"
-			req.URL.Host, req.Host = "localhost:8080", "localhost:8080"
+			req.URL.Host, req.Host = apiServer, apiServer
 		}
 		proxy := &httputil.ReverseProxy{Director: director}
 		proxy.ServeHTTP(c.Writer, c.Request)
 	})
 
-	r.POST("/api/v1/*action", func(c *gin.Context) {
+	r.POST(apiBase+"/*action", func(c *gin.Context) {
 		director := func(req *http.Request) {
 			req.URL.Scheme = "http"
-			req.URL.Host, req.Host = "localhost:8080", "localhost:8080"
+			req.URL.Host, req.Host = apiServer, apiServer
 		}
 		proxy := &httputil.ReverseProxy{Director: director}
 		proxy.ServeHTTP(c.Writer, c.Request)
 	})
+}
+
+var (
+	defaultPageData = templates.PageData{
+		APIBase: "/api/v1",
+
+		// defaults
+		DefaultAlpha:        1,
+		DefaultBeta:         1,
+		PheromoneMultiplier: 2500,
+		EvaporationRate:     0.01,
+		InitialPheromone:    2500,
+
+		GenerationCount:  100,
+		ColonySize:       10,
+		GenerationPeriod: 10,
+		ParentCount:      10,
+
+		// стратегии (простые дефолты)
+		SelectionType: "best",
+		TournamentK:   3,
+
+		CrossoverType: "arithmetic",
+
+		MutationType: "uniform",
+		MutationMin:  -0.2,
+		MutationMax:  0.2,
+		MutationMean: 0,
+		MutationStd:  0.3,
+
+		LocalOptimisation: "noop",
+	}
+)
+
+func (r *Router) Get(c *gin.Context) {
+	files, err := GetFiles(r.apiServer, r.apiBase)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, ginerr.ErrJSONBody(err))
+		return
+	}
+
+	pd := defaultPageData
+	pd.Files = files.Files
+	templates.Page(pd).Render(c.Request.Context(), c.Writer)
 }

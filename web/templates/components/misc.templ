@@ -1,0 +1,14 @@
+package components
+
+import "fmt"
+
+templ input(name string, label string, value any) {
+	<div>
+		<label class="block text-sm text-neutral-400 mb-1">{label}</label>
+		<input
+			id={name}
+			value={fmt.Sprintf("%v", value)}
+			class="w-full bg-neutral-700 p-2 rounded"
+		/>
+	</div>
+}
