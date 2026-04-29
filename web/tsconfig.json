@@ -6,6 +6,8 @@
     "outDir": "./static/js",
     "rootDir": "./ts",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }

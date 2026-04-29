@@ -1,21 +1,18 @@
 import {
   parseTSP,
   getTSP,
-  buildHacoRequest,
   runHacoDetails,
-  type HacoFormInput
 } from "./api.js"
 
 import {
   renderGraph,
-  renderPheromones,
-  renderHeatmap,
-  renderCoeffs,
-  renderBestScore,
   renderAll
 } from "./render.js"
 
-import type { Graph, HacoRunDetailsResponse } from "./types.js"
+import { HacoRunRequest } from "./models/haco/request.js"
+import { HacoRunDetailsResponse } from "./models/haco/response.js"
+import { Graph } from "./models/graph.js"
+import { HacoFormInput, buildHacoRequest } from "./form.js"
 
 // =======================
 // State Management
@@ -90,27 +87,27 @@ function getFormInput(): HacoFormInput | null {
       generation_period: parseInt(elements.generationPeriod.value, 10),
       parent_count: parseInt(elements.parentCount.value, 10),
       
-      selection: selectionType === "best" 
-        ? { type: "best" }
-        : { type: "tournament", k: parseInt(elements.tournamentK.value, 10) },
+      selection_type: selectionType as "best" | "tournament",
+      tournament_k: selectionType === "tournament"
+        ? parseInt(elements.tournamentK.value, 10)
+        : undefined,
       
-      crossover: { type: "arithmetic" },
+      crossover_type: "arithmetic",
       
-      mutation: mutationType === "uniform"
-        ? { 
-            type: "uniform", 
-            min: parseFloat(elements.mutationMin.value), 
-            max: parseFloat(elements.mutationMax.value) 
-          }
-        : { 
-            type: "gauss", 
-            mean: parseFloat(elements.mutationMean.value), 
-            std: parseFloat(elements.mutationStd.value) 
-          },
-      
-      local_optimisation: { 
-        type: elements.localOptimisation.value as "noop" | "2opt" 
-      }
+      mutation_type: mutationType as "uniform" | "gauss",
+      mutation_min: mutationType === "uniform"
+        ? parseFloat(elements.mutationMin.value)
+        : undefined,
+      mutation_max: mutationType === "uniform"
+        ? parseFloat(elements.mutationMax.value)
+        : undefined,
+      mutation_mean: mutationType === "gauss"
+        ? parseFloat(elements.mutationMean.value)
+        : undefined,
+      mutation_std: mutationType === "gauss"
+        ? parseFloat(elements.mutationStd.value)
+        : undefined,   
+      local_optimisation: elements.localOptimisation.value as "noop" | "2opt"
     }
   } catch (error) {
     showError(`Invalid form data: ${error}`)
@@ -168,8 +165,9 @@ async function runHaco() {
   
   try {
     console.log("Building HACO request...")
-    const request = buildHacoRequest(currentGraph, formInput)
-    
+    const request = await buildHacoRequest(currentGraph, formInput)
+
+
     console.log("Running HACO optimization...")
     const result = await runHacoDetails(request)
     

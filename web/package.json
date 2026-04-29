@@ -1,0 +1,14 @@
+{
+    "scripts": {
+        "build": "tsc && esbuild ts/app.ts --bundle --minify --outdir=static/js --platform=browser --format=esm --inject:./ts/shims/reflect-shim.js"
+    },
+    "devDependencies": {
+        "esbuild": "^0.28.0",
+        "typescript": "^6.0.3"
+    },
+    "dependencies": {
+        "class-transformer": "^0.5.1",
+        "class-validator": "^0.15.1",
+        "reflect-metadata": "^0.2.2"
+    }
+}

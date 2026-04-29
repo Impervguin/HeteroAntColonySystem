@@ -1,2 +1,3 @@
 static/js/**/*.js
 templates/**/*.go
+node_modules

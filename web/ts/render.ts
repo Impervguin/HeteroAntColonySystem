@@ -1,11 +1,6 @@
-import type {
-  Graph,
-  HacoRunDetailsResponse,
-  PheromoneMap,
-  AvgCoeffs,
-  Path,
-  GraphNode
-} from "./types.js"
+import { Graph, GraphNode } from "./models/graph.js"
+import { PheromoneMap, Path, AvgCoeffs } from "./models/haco/response.js"
+import { HacoRunDetailsResponse } from "./models/haco/response.js"
 
 // =======================
 // Metadata utils
