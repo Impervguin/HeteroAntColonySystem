@@ -1,4 +1,4 @@
-import { IsArray, IsNumber, IsString, ValidateNested } from "class-validator"
+import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator"
 import { Type } from "class-transformer"
 
 export class AvgCoeffs {
@@ -41,6 +41,60 @@ export class Path {
   score!: number
 }
 
+
+export class MemStat {
+  @IsNumber()
+  run!: number
+
+  @IsNumber()
+  heap!: number
+
+  @IsNumber()
+  sys!: number
+}
+
+export class TimeStat {
+  @IsNumber()
+  run!: number
+
+  @IsOptional()
+  @IsNumber()
+  moment?: number
+
+  @IsNumber()
+  time!: number
+}
+
+export class MemData {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MemStat)
+  stats!: MemStat[]
+
+  @ValidateNested()
+  @Type(() => MemStat)
+  start!: MemStat
+
+  @ValidateNested()
+  @Type(() => MemStat)
+  end!: MemStat
+}
+
+export class TimeData {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TimeStat)
+  runs!: TimeStat[]
+
+  @ValidateNested()
+  @Type(() => TimeStat)
+  start!: TimeStat
+
+  @ValidateNested()
+  @Type(() => TimeStat)
+  end!: TimeStat
+}
+
 export class HacoRunDetailsResponse {
   @IsNumber()
   best_score!: number
@@ -61,4 +115,12 @@ export class HacoRunDetailsResponse {
   @ValidateNested({ each: true })
   @Type(() => Path)
   best_paths!: Path[]
+
+  @ValidateNested()
+  @Type(() => MemData)
+  memory!: MemData
+
+  @ValidateNested()
+  @Type(() => TimeData)
+  time!: TimeData
 }

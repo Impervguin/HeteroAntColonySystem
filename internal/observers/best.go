@@ -3,7 +3,6 @@ package observers
 import (
 	"HeteroAntColonySystem/internal/core/colony"
 	"HeteroAntColonySystem/pkg/graph"
-	"fmt"
 )
 
 type BestPathObserver struct {
@@ -11,11 +10,18 @@ type BestPathObserver struct {
 	bestScores map[uint]float64
 }
 
-func NewBestPathObserver() *BestPathObserver {
-	return &BestPathObserver{
-		bestPaths:  make(map[uint][]*graph.Vertex),
-		bestScores: make(map[uint]float64),
+func NewBestPathObserver(gen, vertexCount uint) *BestPathObserver {
+	o := &BestPathObserver{
+		bestPaths:  make(map[uint][]*graph.Vertex, gen),
+		bestScores: make(map[uint]float64, gen),
 	}
+
+	// pre-allocate best paths
+	for i := uint(0); i < gen; i++ {
+		o.bestPaths[i] = make([]*graph.Vertex, 0, vertexCount)
+	}
+
+	return o
 }
 
 var _ colony.ColonyObserver = (*BestPathObserver)(nil)
@@ -31,14 +37,11 @@ func (o *BestPathObserver) Observe(dto *colony.ColonyObserverDTO) {
 			bestAnt = ant
 		}
 	}
-	fmt.Println("Best score:", bestAnt.Score())
 
 	bestPath := bestAnt.Path()
-	cpy := make([]*graph.Vertex, 0, len(bestPath))
 	for _, v := range bestPath {
-		cpy = append(cpy, v)
+		o.bestPaths[dto.Generation] = append(o.bestPaths[dto.Generation], v)
 	}
-	o.bestPaths[dto.Generation] = cpy
 	o.bestScores[dto.Generation] = bestAnt.Score()
 }
 

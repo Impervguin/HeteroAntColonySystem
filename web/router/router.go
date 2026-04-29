@@ -47,6 +47,7 @@ func Setup(r *gin.Engine, apiServer, apiBase string) {
 
 	rd := r.Group("/render")
 	rd.POST("/graph-stats", router.RenderGraphStats)
+	rd.POST("/runtime-stats", router.RenderRuntimeStats)
 }
 
 var (
@@ -101,4 +102,14 @@ func (r *Router) RenderGraphStats(c *gin.Context) {
 	}
 
 	components.GraphStats(req).Render(c.Request.Context(), c.Writer)
+}
+
+func (r *Router) RenderRuntimeStats(c *gin.Context) {
+	req, err := dto.DeserializeRuntimeStatsRequest(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ginerr.ErrJSONBody(err))
+		return
+	}
+
+	components.RuntimeStats(req).Render(c.Request.Context(), c.Writer)
 }

@@ -11,9 +11,9 @@ type AntParamsObserver struct {
 	m map[uint]mapElement
 }
 
-func NewAntParamsObserver() *AntParamsObserver {
+func NewAntParamsObserver(gen uint) *AntParamsObserver {
 	return &AntParamsObserver{
-		m: make(map[uint]mapElement),
+		m: make(map[uint]mapElement, gen),
 	}
 }
 

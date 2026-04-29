@@ -66,23 +66,28 @@ func (r *Router) RunDetails(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, ginerr.ErrJSONBody(err))
 		return
 	}
+	memoryObserver := observers.NewMemoryObserver(req.GenerationCount)
+	memoryObserver.Start()
+	g, err := req.Graph.Parse()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ginerr.ErrJSONBody(err))
+		return
+	}
 
-	pathObserver := observers.NewBestPathObserver()
-	coeffObserver := observers.NewAntParamsObserver()
-	pmObserver := observers.NewPheromoneMapObserver()
+	pathObserver := observers.NewBestPathObserver(req.GenerationCount, uint(g.Len()))
+	coeffObserver := observers.NewAntParamsObserver(req.GenerationCount)
+	pmObserver := observers.NewPheromoneMapObserver(req.GenerationCount, g)
+
+	timeObserver := observers.NewTimeObserver(req.GenerationCount)
 
 	colony, err := r.colonyFromRequest(
 		req,
 		colony.WithColonyObserver(pathObserver),
 		colony.WithColonyObserver(coeffObserver),
 		colony.WithColonyObserver(pmObserver),
+		colony.WithColonyObserver(memoryObserver),
+		colony.WithColonyObserver(timeObserver),
 	)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, ginerr.ErrJSONBody(err))
-		return
-	}
-
-	g, err := req.Graph.Parse()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ginerr.ErrJSONBody(err))
 		return
@@ -94,13 +99,18 @@ func (r *Router) RunDetails(c *gin.Context) {
 		return
 	}
 
+	timeObserver.Start()
+
 	err = colony.Run()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ginerr.ErrJSONBody(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, dto.SerializeHacoRunDetailsResponse(c, colony.BestPath(), colony.Score(), coeffObserver, pmObserver, pathObserver, req.GenerationCount))
+	memoryObserver.End()
+	timeObserver.End()
+
+	c.JSON(http.StatusOK, dto.SerializeHacoRunDetailsResponse(c, colony.BestPath(), colony.Score(), coeffObserver, pmObserver, pathObserver, memoryObserver, timeObserver, req.GenerationCount))
 }
 
 func (r *Router) colonyFromRequest(req *dto.HacoRunRequest, additional ...colony.HeteroAntColonyOption) (*colony.HeteroAntColony, error) {

@@ -1,0 +1,48 @@
+package components
+
+import (
+    dto "HeteroAntColonySystem/web/router/dto"
+    "fmt"
+)
+
+func formatTime(millis float64) string {
+    if millis >= 1e6 {
+        return fmt.Sprintf("%.2f min", millis / 1e6)
+    }
+    if millis >= 1e3 {
+        return fmt.Sprintf("%.2f sec", millis / 1e3)
+    }
+    return fmt.Sprintf("%.2f ms", millis)
+}
+
+func formatMemory(bytes uint64) string {
+    if bytes >= 1e9 {
+        return fmt.Sprintf("%.2f GB", float64(bytes) / 1e9)
+    }
+    if bytes >= 1e6 {
+        return fmt.Sprintf("%.2f MB", float64(bytes) / 1e6)
+    }
+    if bytes >= 1e3 {
+        return fmt.Sprintf("%.2f KB", float64(bytes) / 1e3)
+    }
+    return fmt.Sprintf("%d B", bytes)
+}
+
+templ RuntimeStats(data *dto.RuntimeStatsRequest) {
+    <div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow" id="runtime-stats-container">
+ 	<h2 class="text-xl font-semibold mb-4 text-amber-300" data-i18n="runtimeStatistics">Runtime Statistics</h2>
+		if data != nil {
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                @stat("score", fmt.Sprintf("%.2f", data.Score), "scoreComment", 2)
+                @stat("pathSeen", fmt.Sprintf("%d", data.SeenPaths), "pathSeenComment", 2)
+                @stat("totalTime", formatTime(data.TotalTime), "totalTimeComment", 1)
+                @stat("minTime", formatTime(data.MinTime), "minTimeComment", 1)
+                @stat("avgTime", formatTime(data.AvgTime), "avgTimeComment", 1)
+                @stat("maxTime", formatTime(data.MaxTime), "maxTimeComment", 1)
+                @stat("minMemory", formatMemory(data.MinMemory), "minMemoryComment", 1)
+                @stat("avgMemory", formatMemory(data.AvgMemory), "avgMemoryComment", 1)
+                @stat("maxMemory", formatMemory(data.MaxMemory), "maxMemoryComment", 1)
+            </div>
+        }
+	</div>
+}

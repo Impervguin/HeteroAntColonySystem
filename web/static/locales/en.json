@@ -90,5 +90,24 @@
   "recommendedQ": "Recommended Q",
   "pheromoneMultiplier": "pheromone multiplier",
   "recommendedRho": "Recommended ρ",
-  "evaporationRate": "evaporation rate"
+  "evaporationRate": "evaporation rate",
+
+  "runtimeStatistics": "Runtime Statistics",
+  "score": "Score",
+  "scoreComment": "best paths length",
+  "pathSeen": "Paths Seen",
+  "pathSeenComment": "count of paths algorithm tried",
+  "totalTime": "Total Time",
+  "minTime": "Min Time",
+  "mineTimeComment": "of one generation",
+  "avgTime": "Avg Time",
+  "avgTimeComment": "of one generation",
+  "maxTime": "Max Time",
+  "maxTimeComment": "of one generation",
+  "minMemory": "Min Memory",
+  "minMemoryComment": "heap, stack, runtime",
+  "avgMemory": "Avg Memory",
+  "avgMemoryComment": "heap, stack, runtime",
+  "maxMemory": "Max Memory",
+  "maxMemoryComment": "heap, stack, runtime"
 }

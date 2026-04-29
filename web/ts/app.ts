@@ -3,7 +3,8 @@ import {
   getTSP,
   runHacoDetails,
   graphStats,
-  renderGraphStats
+  renderGraphStats,
+  renderRuntimeStats
 } from "./api.js"
 
 import {
@@ -16,10 +17,11 @@ import { GraphStatsRequest, GraphStatsResponse } from "./models/tsp.js"
 import { HacoRunDetailsResponse } from "./models/haco/response.js"
 import { Graph } from "./models/graph.js"
 import { HacoFormInput, buildHacoRequest } from "./form.js"
-import { initI18n, setLanguage, getCurrentLanguage, t } from "./i18n.js"
+import { initI18n, setLanguage, getCurrentLanguage, t, updateUI } from "./i18n.js"
 
 import './shims/global-shim.js'
 import * as Plotly from 'plotly.js-dist-min';
+import { fromRunDetailsResponse } from "./models/render.js"
 
 // =======================
 // State Management
@@ -147,12 +149,14 @@ async function handleFileUpload(file: File) {
 
     // Render initial graph without path
     renderGraph(currentGraph)
+    updateUI()
 
     // Clear other plots
     Plotly.newPlot("pheromone-graph", [], {})
     Plotly.newPlot("heatmap", [], {})
     Plotly.newPlot("coeffs", [], {})
     Plotly.newPlot("score", [], {})
+    await updateRuntimeStats(null, 0)
 
     console.log(`File loaded successfully: ${currentGraph.nodes.length} nodes, ${currentGraph.edges.length} edges`)
   } catch (error) {
@@ -175,6 +179,7 @@ async function handleFileChoose(file: string) {
     currentResult = null
 
     await updateGraphStats(currentGraph)
+    updateUI()
 
     // Render initial graph without path
     renderGraph(currentGraph)
@@ -184,6 +189,7 @@ async function handleFileChoose(file: string) {
     Plotly.newPlot("heatmap", [], {})
     Plotly.newPlot("coeffs", [], {})
     Plotly.newPlot("score", [], {})
+    await updateRuntimeStats(null, 0)
 
     console.log(`File loaded successfully: ${currentGraph.nodes.length} nodes, ${currentGraph.edges.length} edges`)
   } catch (error) {
@@ -219,6 +225,8 @@ async function runHaco() {
 
     // Render all visualizations
     renderAll(currentGraph, currentResult)
+    await updateRuntimeStats(result, request.generation_count * request.colony_size)
+    updateUI()
 
     console.log(t('hacoCompleted', { score: result.best_score }))
   } catch (error) {
@@ -267,6 +275,23 @@ async function updateGraphStats(graph: Graph | null) {
     container.innerHTML = newHTML
   } catch (error) {
     console.error(t('failedToLoadGraphStats') + ":", error)
+  }
+}
+
+async function updateRuntimeStats(result: HacoRunDetailsResponse | null, seenPaths: number) {
+  try {
+    const container = document.getElementById("runtime-stats")!
+    if (result === null) {
+      container.innerHTML = ""
+      return 
+    }
+
+    const req = fromRunDetailsResponse(result, seenPaths)
+
+    const newHTML = await renderRuntimeStats(req)
+    container.innerHTML = newHTML
+  } catch (error) {
+    showError(`${t('failedToLoadRuntimeStats')}: ${error}`)
   }
 }
 

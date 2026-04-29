@@ -49,7 +49,7 @@ async function loadTranslations(lang: string): Promise<void> {
   }
 }
 
-function updateUI(): void {
+export function updateUI(): void {
   // Update elements that have data-i18n attribute
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');

@@ -13,6 +13,8 @@ type HacoRunDetailsResponse struct {
 	AvgCoeffs         []avgCoeffs  `json:"avg_coeffs"`
 	FinalPheromoneMap pheromoneMap `json:"final_pheromone_map"`
 	BestPaths         []path       `json:"best_paths"`
+	Memory            memData      `json:"memory"`
+	Time              timeData     `json:"time"`
 }
 
 type avgCoeffs struct {
@@ -37,12 +39,40 @@ type path struct {
 	Score float64  `json:"score"`
 }
 
+type memData struct {
+	Stats []memStat `json:"stats"`
+	Start memStat   `json:"start"`
+	End   memStat   `json:"end"`
+}
+
+type timeData struct {
+	Stats []timeStat `json:"runs"`
+	Start timeStat   `json:"start"`
+	End   timeStat   `json:"end"`
+}
+
+type memStat struct {
+	Run  uint   `json:"run"`
+	Heap uint64 `json:"heap"`
+	Sys  uint64 `json:"sys"`
+}
+
+type timeStat struct {
+	Run uint `json:"run"`
+
+	// Milliseconds
+	Moment *float64 `json:"moment,omitempty"`
+	Time   float64  `json:"time"`
+}
+
 func SerializeHacoRunDetailsResponse(_ *gin.Context,
 	bestPath []*graph.Vertex,
 	bestScore float64,
 	coeffObserver *observers.AntParamsObserver,
 	pmObserver *observers.PheromoneMapObserver,
 	pathObserver *observers.BestPathObserver,
+	memoryObserver *observers.MemoryObserver,
+	timeObserver *observers.TimeObserver,
 	gens uint,
 ) any {
 	bestPaths := make([]path, 0, gens)
@@ -84,6 +114,28 @@ func SerializeHacoRunDetailsResponse(_ *gin.Context,
 		p = append(p, v.ID().String())
 	}
 
+	mData := memoryObserver.Data()
+	tData := timeObserver.Data()
+	memStats := make([]memStat, 0, len(mData.Stats))
+	for _, s := range mData.Stats {
+		memStats = append(memStats, memStat{
+			Run:  s.Run,
+			Heap: s.Memory.Heap,
+			Sys:  s.Memory.Sys,
+		})
+	}
+
+	timeStats := make([]timeStat, 0, len(tData.Runs))
+	for _, s := range tData.Runs {
+		timeStats = append(timeStats, timeStat{
+			Run:  s.Run,
+			Time: float64(s.Time.Milliseconds()) + (float64(s.Time.Microseconds()) / 1000),
+		})
+	}
+
+	startT := float64(tData.StartTime.UnixMilli()) + (float64(tData.StartTime.UnixMicro()) / 1000)
+	endT := float64(tData.EndTime.UnixMilli()) + (float64(tData.EndTime.UnixMicro()) / 1000)
+
 	return &HacoRunDetailsResponse{
 		BestScore: bestScore,
 		BestPath:  p,
@@ -91,6 +143,26 @@ func SerializeHacoRunDetailsResponse(_ *gin.Context,
 		AvgCoeffs: coeffs,
 		FinalPheromoneMap: pheromoneMap{
 			Items: items,
+		},
+		Memory: memData{
+			Stats: memStats,
+			Start: memStat{
+				Heap: mData.Start.Heap,
+				Sys:  mData.Start.Sys,
+			},
+			End: memStat{
+				Heap: mData.End.Heap,
+				Sys:  mData.End.Sys,
+			},
+		},
+		Time: timeData{
+			Stats: timeStats,
+			Start: timeStat{
+				Moment: &startT,
+			},
+			End: timeStat{
+				Moment: &endT,
+			},
 		},
 	}
 }
