@@ -4,6 +4,8 @@ import (
 	"HeteroAntColonySystem/web/templates/components"
 )
 
+import "fmt"
+
 type PageData struct {
 	APIBase string
 
@@ -78,11 +80,20 @@ templ Page(d PageData) {
 
 <div class="max-w-7xl mx-auto p-6">
 
-	<!-- HEADER -->
-	<div class="mb-6">
-		<h1 class="text-3xl font-bold text-amber-400">🐜 HACO Visualizer</h1>
-		<p class="text-neutral-400">Ant Colony Optimization playground</p>
-	</div>
+ 	<!-- HEADER -->
+ 	<div class="mb-6 flex justify-between items-start">
+ 		<div>
+ 			<h1 class="text-3xl font-bold text-amber-400" data-i18n="hacoVisualizerTitle">🐜 HACO Visualizer</h1>
+ 			<p class="text-neutral-400" data-i18n="acoPlayground">Ant Colony Optimization playground</p>
+ 		</div>
+ 		<div class="flex items-center">
+ 			<label class="text-neutral-400 mr-2" data-i18n="language">Language:</label>
+ 			<select id="language-select" class="bg-neutral-700 text-neutral-100 p-2 rounded">
+ 				<option value="en">English</option>
+ 				<option value="ru">Русский</option>
+ 			</select>
+ 		</div>
+ 	</div>
 
 	<!-- INPUT PANEL -->
 	<div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
@@ -111,11 +122,11 @@ templ Page(d PageData) {
 
 	<!-- GRAPHS -->
 
-	@panel("Graph", "graph")
-	@panel("Pheromones (edges)", "pheromone-graph")
-	@panel("Heatmap", "heatmap")
-	@panel("Alpha / Beta", "coeffs")
-	@panel("Best Path Score", "score")
+ 	@panel("graphPanel", "graph")
+ 	@panel("pheromonesPanel", "pheromone-graph")
+ 	@panel("heatmapPanel", "heatmap")
+ 	@panel("alphaBetaPanel", "coeffs")
+ 	@panel("bestPathScorePanel", "score")
 
 </div>
 
@@ -138,9 +149,9 @@ window.APP_CONFIG = {
 
 
 
-templ panel(title string, id string) {
-	<div class="bg-neutral-800 rounded-xl p-4 mb-6 shadow">
-		<h2 class="text-lg font-semibold mb-2 text-amber-300">{title}</h2>
-		<div id={id} class="h-[400px]"></div>
-	</div>
+templ panel(titleKey string, id string) {
+ 	<div class="bg-neutral-800 rounded-xl p-4 mb-6 shadow">
+ 		<h2 class="text-lg font-semibold mb-2 text-amber-300" { fmt.Sprintf("data-i18n=%s", titleKey) }>{ titleKey }</h2>
+ 		<div id={id} class="h-[400px]"></div>
+ 	</div>
 }

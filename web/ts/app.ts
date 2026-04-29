@@ -16,6 +16,7 @@ import { GraphStatsRequest, GraphStatsResponse } from "./models/tsp.js"
 import { HacoRunDetailsResponse } from "./models/haco/response.js"
 import { Graph } from "./models/graph.js"
 import { HacoFormInput, buildHacoRequest } from "./form.js"
+import { initI18n, setLanguage, getCurrentLanguage, t } from "./i18n.js"
 
 import './shims/global-shim.js'
 import * as Plotly from 'plotly.js-dist-min';
@@ -72,38 +73,38 @@ const elements = {
 
 function showError(message: string) {
   console.error(message)
-  alert(`Error: ${message}`)
+  alert(`${t('error')}: ${message}`)
 }
 
 function disableRunButton(disabled: boolean) {
   elements.runBtn.disabled = disabled
-  elements.runBtn.textContent = disabled ? "Running..." : "Run HACO"
+  elements.runBtn.textContent = disabled ? t('running') : t('runHaco')
 }
 
 function getFormInput(): HacoFormInput | null {
   try {
     const selectionType = elements.selectionType.value
     const mutationType = elements.mutationType.value
-    
+
     return {
       default_alpha: parseFloat(elements.defaultAlpha.value),
       default_beta: parseFloat(elements.defaultBeta.value),
       pheromone_multiplier: parseFloat(elements.pheromoneMultiplier.value),
       evaporation_rate: parseFloat(elements.evaporationRate.value),
       initial_pheromone: parseFloat(elements.initialPheromone.value),
-      
+
       generation_count: parseInt(elements.generationCount.value, 10),
       colony_size: parseInt(elements.colonySize.value, 10),
       generation_period: parseInt(elements.generationPeriod.value, 10),
       parent_count: parseInt(elements.parentCount.value, 10),
-      
+
       selection_type: selectionType as "best" | "tournament",
       tournament_k: selectionType === "tournament"
         ? parseInt(elements.tournamentK.value, 10)
         : undefined,
-      
+
       crossover_type: elements.crossoverType.value as "arithmetic",
-      
+
       mutation_type: mutationType as "uniform" | "gauss",
       mutation_min: mutationType === "uniform"
         ? parseFloat(elements.mutationMin.value)
@@ -116,11 +117,11 @@ function getFormInput(): HacoFormInput | null {
         : undefined,
       mutation_std: mutationType === "gauss"
         ? parseFloat(elements.mutationStd.value)
-        : undefined,   
+        : undefined,
       local_optimisation: elements.localOptimisation.value as "noop" | "2opt"
     }
   } catch (error) {
-    showError(`Invalid form data: ${error}`)
+    showError(`${t('invalidFormData')}: ${error}`)
     return null
   }
 }
@@ -133,29 +134,29 @@ async function handleFileUpload(file: File) {
   try {
     console.log(`Uploading file: ${file.name}`)
     const response = await parseTSP(file)
-    
+
     if (!response.graph) {
-      throw new Error("No graph data received")
+      throw new Error(t('noGraphDataReceived'))
     }
-    
+
     currentGraph = response.graph
     currentFilename = file.name
     currentResult = null
-    
+
     await updateGraphStats(currentGraph)
-    
+
     // Render initial graph without path
     renderGraph(currentGraph)
-    
+
     // Clear other plots
     Plotly.newPlot("pheromone-graph", [], {})
     Plotly.newPlot("heatmap", [], {})
     Plotly.newPlot("coeffs", [], {})
     Plotly.newPlot("score", [], {})
-    
+
     console.log(`File loaded successfully: ${currentGraph.nodes.length} nodes, ${currentGraph.edges.length} edges`)
   } catch (error) {
-    showError(`Failed to load TSP file: ${error}`)
+    showError(`${t('failedToLoadTSP')}: ${error}`)
     currentGraph = null
   }
 }
@@ -164,20 +165,20 @@ async function handleFileChoose(file: string) {
   try {
     console.log(`Getting file: ${file}`)
     const response = await getTSP(file)
-    
+
     if (!response.graph) {
-      throw new Error("No graph data received")
+      throw new Error(t('noGraphDataReceived'))
     }
-    
+
     currentGraph = response.graph
     currentFilename = file
     currentResult = null
 
     await updateGraphStats(currentGraph)
-    
+
     // Render initial graph without path
     renderGraph(currentGraph)
-    
+
     // Clear other plots
     Plotly.newPlot("pheromone-graph", [], {})
     Plotly.newPlot("heatmap", [], {})
@@ -186,7 +187,7 @@ async function handleFileChoose(file: string) {
 
     console.log(`File loaded successfully: ${currentGraph.nodes.length} nodes, ${currentGraph.edges.length} edges`)
   } catch (error) {
-    showError(`Failed to load TSP file: ${error}`)
+    showError(`${t('failedToLoadTSP')}: ${error}`)
     currentGraph = null
   }
 }
@@ -197,31 +198,31 @@ async function handleFileChoose(file: string) {
 
 async function runHaco() {
   if (!currentGraph) {
-    showError("Please load a TSP file first")
+    showError(t('loadTSPFirst'))
     return
   }
-  
+
   const formInput = getFormInput()
   if (!formInput) return
-  
+
   disableRunButton(true)
-  
+
   try {
-    console.log("Building HACO request...")
+    console.log(t('buildingHacoRequest'))
     const request = await buildHacoRequest(currentGraph, formInput)
 
 
-    console.log("Running HACO optimization...")
+    console.log(t('runningHaco'))
     const result = await runHacoDetails(request)
-    
+
     currentResult = result
-    
+
     // Render all visualizations
     renderAll(currentGraph, currentResult)
-    
-    console.log(`HACO completed! Best score: ${result.best_score}`)
+
+    console.log(t('hacoCompleted', { score: result.best_score }))
   } catch (error) {
-    showError(`HACO execution failed: ${error}`)
+    showError(`${t('hacoFailed')}: ${error}`)
   } finally {
     disableRunButton(false)
   }
@@ -265,7 +266,7 @@ async function updateGraphStats(graph: Graph | null) {
     
     container.innerHTML = newHTML
   } catch (error) {
-    console.error("Failed to load graph statistics:", error)
+    console.error(t('failedToLoadGraphStats') + ":", error)
   }
 }
 
@@ -309,14 +310,22 @@ function setupEventListeners() {
       await handleFileChoose(file.value)
     }
   })
-  
+
   // Run button
   elements.runBtn.addEventListener("click", runHaco)
-  
+
   // UI state changes
   elements.mutationType.addEventListener("change", updateMutationFields)
   elements.selectionType.addEventListener("change", updateSelectionFields)
-  
+
+  // Language selector
+  const languageSelect = document.getElementById("language-select") as HTMLSelectElement
+  if (languageSelect) {
+    languageSelect.addEventListener("change", async () => {
+      await setLanguage(languageSelect.value)
+    })
+  }
+
   // Initial UI state
   updateMutationFields()
   updateSelectionFields()
@@ -327,10 +336,17 @@ function setupEventListeners() {
 // Initialization
 // =======================
 
-function init() {
+async function init() {
   console.log("Initializing HACO Visualizer...")
+  await initI18n()
   setupEventListeners()
-  
+
+  // Set initial language in selector
+  const languageSelect = document.getElementById("language-select") as HTMLSelectElement
+  if (languageSelect) {
+    languageSelect.value = getCurrentLanguage()
+  }
+
   // Clear initial plots
   const plotIds = ["graph", "pheromone-graph", "heatmap", "coeffs", "score"]
   plotIds.forEach(id => {

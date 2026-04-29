@@ -17,62 +17,62 @@ type StrategyBlockData struct {
 templ StrategiesBlock(d StrategyBlockData) {
 <div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
 
-	<h2 class="text-xl font-semibold mb-4 text-amber-300">Strategies</h2>
+ 	<h2 class="text-xl font-semibold mb-4 text-amber-300" data-i18n="strategies">Strategies</h2>
 
-	<div class="grid grid-cols-4 gap-4">
+ 	<div class="grid grid-cols-4 gap-4">
 
-		<!-- SELECTION -->
-		<div class="gap-4">
-			<label>Selection</label>
-			<select id="selection-type" class="w-full bg-neutral-700 p-2 rounded">
-				<option value="best">Best</option>
-				<option value="tournament">Tournament</option>
-			</select>
+ 		<!-- SELECTION -->
+ 		<div class="gap-4">
+ 			<label data-i18n="selection">Selection</label>
+ 			<select id="selection-type" class="w-full bg-neutral-700 p-2 rounded">
+ 				<option value="best" data-i18n-option="best">Best</option>
+ 				<option value="tournament" data-i18n-option="tournament">Tournament</option>
+ 			</select>
 
             <div id="selection-tournament" class="hidden">
-                @input("tournament-k", "Tournament K", d.TournamentK)
+                @input("tournament-k", "tournamentK", d.TournamentK)
             </div>
-		</div>
+ 		</div>
 
-		
 
-		<!-- MUTATION -->
-		<div>
-			<label>Mutation</label>
-			<select id="mutation-type" class="w-full bg-neutral-700 p-2 rounded">
-				<option value="uniform">Uniform</option>
-				<option value="gauss">Gauss</option>
-			</select>
+
+ 		<!-- MUTATION -->
+ 		<div>
+ 			<label data-i18n="mutation">Mutation</label>
+ 			<select id="mutation-type" class="w-full bg-neutral-700 p-2 rounded">
+ 				<option value="uniform" data-i18n-option="uniform">Uniform</option>
+ 				<option value="gauss" data-i18n-option="gauss">Gauss</option>
+ 			</select>
 
             <div id="mutation-uniform" class="hidden">
-                @input("mutation-min", "Min", d.MutationMin)
-                @input("mutation-max", "Max", d.MutationMax)
+                @input("mutation-min", "min", d.MutationMin)
+                @input("mutation-max", "max", d.MutationMax)
             </div>
 
             <div id="mutation-gauss" class="hidden">
-                @input("mutation-mean", "Mean", d.MutationMean)
-                @input("mutation-std", "Std", d.MutationStd)
+                @input("mutation-mean", "mean", d.MutationMean)
+                @input("mutation-std", "std", d.MutationStd)
             </div>
-		</div>
+ 		</div>
 
 
         <!-- Crossover -->
         <div>
-            <label>Crossover</label>
+            <label data-i18n="crossover">Crossover</label>
             <select id="crossover-type" class="w-full bg-neutral-700 p-2 rounded">
-                <option value="arithmetic">Arithmetic</option>
+                <option value="arithmetic" data-i18n-option="arithmetic">Arithmetic</option>
             </select>
         </div>
 
 
-		<!-- LOCAL OPT -->
-		<div>
-			<label>Local Optimisation</label>
-			<select id="local-optimisation" class="w-full bg-neutral-700 p-2 rounded">
-				<option value="noop">No-op</option>
-				<option value="2opt">2-opt</option>
-			</select>
-		</div>
+ 		<!-- LOCAL OPT -->
+ 		<div>
+ 			<label data-i18n="localOptimisation">Local Optimisation</label>
+ 			<select id="local-optimisation" class="w-full bg-neutral-700 p-2 rounded">
+ 				<option value="noop" data-i18n-option="noop">No-op</option>
+ 				<option value="2opt" data-i18n-option="twoOpt">2-opt</option>
+ 			</select>
+ 		</div>
 
 	</div>
 </div>

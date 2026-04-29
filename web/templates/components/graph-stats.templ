@@ -32,20 +32,20 @@ func formatPossibleSolutions(solutions float64) string {
 
 templ GraphStats(data *dto.GraphStatsRequest) {
 	<div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow" id="graph-stats-container">
-		<h2 class="text-xl font-semibold mb-4 text-amber-300">Graph Statistics</h2>
+ 	<h2 class="text-xl font-semibold mb-4 text-amber-300" data-i18n="graphStatistics">Graph Statistics</h2>
 		if data != nil {
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <!-- Basic Info -->
 
-                @stat("Nodes", fmt.Sprintf("%d", data.NodesCount), "vertices", 1)
-                @stat("Edges", fmt.Sprintf("%d", data.EdgesCount), "connections", 1)
-                @stat("Possible Solutions", formatPossibleSolutions(data.PossibleSolutions), "", 1)
-                @stat("Avg Edge Weight", fmt.Sprintf("%.2f", data.AvgEdgeWeight), "units", 1)
-                @stat("Min Edge Weight", fmt.Sprintf("%.2f", data.MinEdgeWeight), "", 1)
-                @stat("Max Edge Weight", fmt.Sprintf("%.2f", data.MaxEdgeWeight), "", 1)
-                @stat("Expected Path Length", fmt.Sprintf("%.2f", data.ExpectedPathLength), "avg weight × nodes", 2)
-                @stat("Recommended Q", fmt.Sprintf("%.2f", data.RecommendedPheromoneMultiplier), "pheromone multiplier", 2)
-                @stat("Recommended ρ", fmt.Sprintf("%.3f", data.RecommendedEvaporationRate), "evaporation rate", 2)
+                @stat("nodes", fmt.Sprintf("%d", data.NodesCount), "vertices", 1)
+                @stat("edges", fmt.Sprintf("%d", data.EdgesCount), "connections", 1)
+                @stat("possibleSolutions", formatPossibleSolutions(data.PossibleSolutions), "", 1)
+                @stat("avgEdgeWeight", fmt.Sprintf("%.2f", data.AvgEdgeWeight), "units", 1)
+                @stat("minEdgeWeight", fmt.Sprintf("%.2f", data.MinEdgeWeight), "", 1)
+                @stat("maxEdgeWeight", fmt.Sprintf("%.2f", data.MaxEdgeWeight), "", 1)
+                @stat("expectedPathLength", fmt.Sprintf("%.2f", data.ExpectedPathLength), "avgWeightNodes", 2)
+                @stat("recommendedQ", fmt.Sprintf("%.2f", data.RecommendedPheromoneMultiplier), "pheromoneMultiplier", 2)
+                @stat("recommendedRho", fmt.Sprintf("%.3f", data.RecommendedEvaporationRate), "evaporationRate", 2)
                 
             </div>
         }

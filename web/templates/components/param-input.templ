@@ -15,21 +15,21 @@ type ParamsBlockData struct {
 templ ParamsBlock(d ParamsBlockData) {
 <div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
 
-	<h2 class="text-xl font-semibold mb-4 text-amber-300">Parameters</h2>
+ 	<h2 class="text-xl font-semibold mb-4 text-amber-300" data-i18n="parameters">Parameters</h2>
 
-	<div class="grid grid-cols-4 gap-4">
+ 	<div class="grid grid-cols-4 gap-4">
 
-		@input("default-alpha", "Alpha", d.DefaultAlpha)
-		@input("default-beta", "Beta", d.DefaultBeta)
-		@input("pheromone-multiplier", "Pheromone Mult", d.PheromoneMultiplier)
-		@input("evaporation-rate", "Evaporation", d.EvaporationRate)
+ 		@input("default-alpha", "alpha", d.DefaultAlpha)
+ 		@input("default-beta", "beta", d.DefaultBeta)
+ 		@input("pheromone-multiplier", "pheromoneMult", d.PheromoneMultiplier)
+ 		@input("evaporation-rate", "evaporation", d.EvaporationRate)
 
-		@input("initial-pheromone", "Initial Pheromone", d.InitialPheromone)
-		@input("generation-count", "Generations", d.GenerationCount)
-		@input("colony-size", "Colony Size", d.ColonySize)
-		@input("generation-period", "Generation Period", d.GenerationPeriod)
+ 		@input("initial-pheromone", "initialPheromone", d.InitialPheromone)
+ 		@input("generation-count", "generations", d.GenerationCount)
+ 		@input("colony-size", "colonySize", d.ColonySize)
+ 		@input("generation-period", "generationPeriod", d.GenerationPeriod)
 
-		@input("parent-count", "Parent Count", d.ParentCount)
+ 		@input("parent-count", "parentCount", d.ParentCount)
 
 	</div>
 </div>

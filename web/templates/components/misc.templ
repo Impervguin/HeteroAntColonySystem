@@ -2,23 +2,23 @@ package components
 
 import "fmt"
 
-templ input(name string, label string, value any) {
-	<div>
-		<label class="block text-sm text-neutral-400 mb-1">{label}</label>
-		<input
-			id={name}
-			value={fmt.Sprintf("%v", value)}
-			class="w-full bg-neutral-700 p-2 rounded"
-		/>
-	</div>
+templ input(name string, labelKey string, value any) {
+ 	<div>
+ 		<label class="block text-sm text-neutral-400 mb-1" { fmt.Sprintf("data-i18n=%s", labelKey) }>{ labelKey }</label>
+ 		<input
+ 			id={name}
+ 			value={fmt.Sprintf("%v", value)}
+ 			class="w-full bg-neutral-700 p-2 rounded"
+ 		/>
+ 	</div>
 }
 
-templ stat(name string, value string, comment string, col int) {
-	<div class={ fmt.Sprintf("bg-neutral-700 rounded-lg p-3 col-span-%d", col) }>
-		<div class="text-neutral-400 text-sm">{ name }</div>
-		<div class="text-2xl font-bold text-amber-300">{ value }</div>
-		if comment != "" {
-			<div class="text-neutral-500 text-xs mt-1">{ comment }</div>
-		}
-	</div>
+templ stat(nameKey string, value string, commentKey string, col int) {
+ 	<div class={ fmt.Sprintf("bg-neutral-700 rounded-lg p-3 col-span-%d", col) }>
+ 		<div class="text-neutral-400 text-sm" { fmt.Sprintf("data-i18n=%s", nameKey) }>{ nameKey }</div>
+ 		<div class="text-2xl font-bold text-amber-300">{ value }</div>
+ 		if commentKey != "" {
+ 			<div class="text-neutral-500 text-xs mt-1" { fmt.Sprintf("data-i18n=%s", commentKey) }>{ commentKey }</div>
+ 		}
+ 	</div>
 }

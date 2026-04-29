@@ -1,6 +1,7 @@
 import { Graph, GraphNode, GraphEdge } from "./models/graph.js"
 import { PheromoneMap, Path, AvgCoeffs } from "./models/haco/response.js"
 import { HacoRunDetailsResponse } from "./models/haco/response.js"
+import { t } from "./i18n.js"
 
 import './shims/global-shim.js'
 import * as Plotly from 'plotly.js-dist-min';
@@ -75,7 +76,7 @@ export function renderGraph(
       y: edgeYs,
       mode: "lines",
       type: "scatter",
-      name: "other edges",
+      name: t("otherEdges"),
       line: {
         color: "rgba(115, 115, 115, 0.3)", // neutral-500 with low opacity
         width: 1.5,
@@ -123,7 +124,7 @@ export function renderGraph(
       y: pathEdgeYs,
       mode: "lines",
       type: "scatter",
-      name: "best path (TSP cycle)",
+      name: t("bestPathTSP"),
       line: {
         color: "#f59e0b", // amber-500
         width: 3,
@@ -140,7 +141,7 @@ export function renderGraph(
     y: ys,
     mode: "markers+text",
     type: "scatter",
-    name: "cities",
+    name: t("cities"),
     text: nodeNames,
     textposition: "top center",
     textfont: {
@@ -158,7 +159,7 @@ export function renderGraph(
       }
     },
     hoverinfo: "text",
-    hovertext: nodeNames.map((name, idx) => 
+    hovertext: nodeNames.map((name, idx) =>
       `<b style="color:#f59e0b">${name}</b><br>ID: ${nodes[idx].id}<br>Coordinates: (${xs[idx].toFixed(2)}, ${ys[idx].toFixed(2)})`
     ),
     showlegend: true
@@ -171,7 +172,7 @@ export function renderGraph(
 
   const layout = {
     title: {
-      text: "TSP Graph Visualization - Best Path Cycle",
+      text: t("tspGraphTitle"),
       font: {
         size: 16,
         family: "Arial, sans-serif",
@@ -183,7 +184,7 @@ export function renderGraph(
     },
     xaxis: {
       title: {
-        text: "X Coordinate",
+        text: t("xCoordinate"),
         font: { color: "#a3a3a3" } // neutral-400
       },
       showgrid: true,
@@ -198,7 +199,7 @@ export function renderGraph(
     },
     yaxis: {
       title: {
-        text: "Y Coordinate",
+        text: t("yCoordinate"),
         font: { color: "#a3a3a3" } // neutral-400
       },
       showgrid: true,
@@ -310,7 +311,7 @@ export function renderPheromones(
       y: edgeYs,
       mode: "lines",
       type: "scatter",
-      name: "graph edges",
+      name: t("graphEdges"),
       line: {
         color: "rgba(115, 115, 115, 0.15)",
         width: 1
@@ -402,7 +403,7 @@ export function renderPheromones(
     y: ys,
     mode: "markers+text",
     type: "scatter",
-    name: "cities",
+    name: t("cities"),
     text: nodeNames,
     textposition: "top center",
     textfont: {
@@ -420,7 +421,7 @@ export function renderPheromones(
       }
     },
     hoverinfo: "text",
-    hovertext: nodeNames.map((name, idx) => 
+    hovertext: nodeNames.map((name, idx) =>
       `<b style="color:#f59e0b">${name}</b><br>ID: ${nodes[idx].id}<br>Coordinates: (${xs[idx].toFixed(2)}, ${ys[idx].toFixed(2)})`
     ),
     showlegend: true,
@@ -433,7 +434,7 @@ export function renderPheromones(
     y: [null],
     mode: "markers",
     type: "scatter",
-    name: "pheromone intensity",
+    name: t("pheromoneIntensityLegend"),
     marker: {
       colorscale: [
         [0, "#3b82f6"],    // blue (low)
@@ -443,7 +444,7 @@ export function renderPheromones(
       showscale: true,
       colorbar: {
         title: {
-          text: "Pheromone Intensity",
+          text: t("pheromoneIntensity"),
           font: { color: "#d4d4d4", size: 12 },
           side: "right"
         },
@@ -471,7 +472,7 @@ export function renderPheromones(
 
   const layout = {
     title: {
-      text: "Pheromone Distribution on Graph",
+      text: t("pheromoneDistributionTitle"),
       font: {
         size: 16,
         family: "Arial, sans-serif",
@@ -483,7 +484,7 @@ export function renderPheromones(
     },
     xaxis: {
       title: {
-        text: "X Coordinate",
+        text: t("xCoordinate"),
         font: { color: "#a3a3a3" }
       },
       showgrid: true,
@@ -498,7 +499,7 @@ export function renderPheromones(
     },
     yaxis: {
       title: {
-        text: "Y Coordinate",
+        text: t("yCoordinate"),
         font: { color: "#a3a3a3" }
       },
       showgrid: true,
@@ -636,7 +637,7 @@ export function renderHeatmap(
     showscale: true,
     colorbar: {
       title: {
-        text: "Pheromone Level",
+        text: t("pheromoneLevel"),
         font: { color: "#d4d4d4", size: 12 },
         side: "right" as "right",
       },
@@ -660,7 +661,7 @@ export function renderHeatmap(
 
   const layout = {
     title: {
-      text: "Pheromone Heatmap Matrix",
+      text: t("pheromoneHeatmapTitle"),
       font: {
         size: 16,
         family: "Arial, sans-serif",
@@ -672,7 +673,7 @@ export function renderHeatmap(
     },
     xaxis: {
       title: {
-        text: "Target Node",
+        text: t("targetNode"),
         font: { color: "#a3a3a3" }
       },
       tickangle: labelRotation,
@@ -688,7 +689,7 @@ export function renderHeatmap(
     },
     yaxis: {
       title: {
-        text: "Source Node",
+        text: t("sourceNode"),
         font: { color: "#a3a3a3" }
       },
       tickfont: {
@@ -768,7 +769,7 @@ export function renderCoeffs(coeffs: AvgCoeffs[]) {
     {
       x: x,
       y: coeffs.map(c => c.alpha),
-      name: "Alpha (α)",
+      name: t("alphaLabel"),
       type: "scatter" as "scatter",
       mode: "lines+markers" as "lines+markers",
       line: {
@@ -786,17 +787,17 @@ export function renderCoeffs(coeffs: AvgCoeffs[]) {
         }
       },
       hoverinfo: "text" as "text",
-      hovertext: coeffs.map(c => 
-        `<b>Alpha (α)</b><br>
-         Run: ${c.run}<br>
-         Value: ${c.alpha.toFixed(4)}<br>`
+      hovertext: coeffs.map(c =>
+        `<b>${t("alphaLabel")}</b><br>
+          Run: ${c.run}<br>
+          Value: ${c.alpha.toFixed(4)}<br>`
       ),
       showlegend: true
     },
     {
       x: x,
       y: coeffs.map(c => c.beta),
-      name: "Beta (β)",
+      name: t("betaLabel"),
       type: "scatter" as "scatter",
       mode: "lines+markers" as "lines+markers",
       line: {
@@ -814,10 +815,10 @@ export function renderCoeffs(coeffs: AvgCoeffs[]) {
         }
       },
       hoverinfo: "text" as "text",
-      hovertext: coeffs.map(c => 
-        `<b>Beta (β)</b><br>
-         Run: ${c.run}<br>
-         Value: ${c.beta.toFixed(4)}<br>`
+      hovertext: coeffs.map(c =>
+        `<b>${t("betaLabel")}</b><br>
+          Run: ${c.run}<br>
+          Value: ${c.beta.toFixed(4)}<br>`
       ),
       showlegend: true
     }
@@ -826,7 +827,7 @@ export function renderCoeffs(coeffs: AvgCoeffs[]) {
   // Calculate layout
   const layout = {
     title: {
-      text: "Parameter Evolution Over Generations",
+      text: t("parameterEvolutionTitle"),
       font: {
         size: 16,
         family: "Arial, sans-serif",
@@ -838,7 +839,7 @@ export function renderCoeffs(coeffs: AvgCoeffs[]) {
     },
     xaxis: {
       title: {
-        text: "Generation (Run)",
+        text: t("generationRun"),
         font: { color: "#a3a3a3" }
       },
       showgrid: true,
@@ -854,7 +855,7 @@ export function renderCoeffs(coeffs: AvgCoeffs[]) {
     },
     yaxis: {
       title: {
-        text: "Parameter Value",
+        text: t("parameterValue"),
         font: { color: "#a3a3a3" }
       },
       showgrid: true,
@@ -900,7 +901,7 @@ export function renderCoeffs(coeffs: AvgCoeffs[]) {
         y: 1.02,
         xref: "paper" as "paper",
         yref: "paper" as "paper",
-        text: "Higher α = more pheromone influence | Higher β = more heuristic influence",
+        text: t("alphaBetaHint"),
         showarrow: false,
         font: {
           size: 10,
@@ -953,7 +954,7 @@ export function renderBestScore(paths: Path[]) {
     {
       x: runs,
       y: scores,
-      name: "Best Path Score",
+      name: t("bestPathScore"),
       type: "scatter" as "scatter",
       mode: "lines+markers" as "markers" | "lines+markers",
       line: {
@@ -971,11 +972,11 @@ export function renderBestScore(paths: Path[]) {
         }
       },
       hoverinfo: "text" as "text",
-      hovertext: scores.map((score, idx) => 
+      hovertext: scores.map((score, idx) =>
         `<b>Generation ${runs[idx]}</b><br>
-         Score: ${score.toFixed(2)}<br>
-         ${idx > 0 ? `Improvement: ${((scores[idx-1] - score) / scores[idx-1] * 100).toFixed(2)}%` : 'Initial generation'}<br>
-         ${score === bestScore ? 'Best score' : ''}`
+          Score: ${score.toFixed(2)}<br>
+          ${idx > 0 ? `Improvement: ${((scores[idx-1] - score) / scores[idx-1] * 100).toFixed(2)}%` : 'Initial generation'}<br>
+          ${score === bestScore ? 'Best score' : ''}`
       ),
       showlegend: true,
       fill: "tozeroy" as "tozeroy",
@@ -987,7 +988,7 @@ export function renderBestScore(paths: Path[]) {
   traces.push({
     x: [bestRun],
     y: [bestScore],
-    name: "Global Best",
+    name: t("globalBest"),
     type: "scatter",
     mode: "markers" as "markers" | "lines+markers",
     marker: {
@@ -1000,10 +1001,10 @@ export function renderBestScore(paths: Path[]) {
       }
     },
     hoverinfo: "text",
-    hovertext: [`<b>Global Best</b><br>
-                 Generation: ${bestRun}<br>
-                 Score: ${bestScore.toFixed(2)}<br>
-                 Improvement: ${improvement}% from start`],
+    hovertext: [`<b>${t("globalBest")}</b><br>
+                  Generation: ${bestRun}<br>
+                  Score: ${bestScore.toFixed(2)}<br>
+                  Improvement: ${improvement}% from start`],
     showlegend: true
   })
   
@@ -1071,7 +1072,7 @@ export function renderBestScore(paths: Path[]) {
   
   const layout = {
     title: {
-      text: "Best Path Score Evolution Over Generations",
+      text: t("bestPathEvolutionTitle"),
       font: {
         size: 16,
         family: "Arial, sans-serif",
@@ -1083,7 +1084,7 @@ export function renderBestScore(paths: Path[]) {
     },
     xaxis: {
       title: {
-        text: "Generation",
+        text: t("generation"),
         font: { color: "#a3a3a3" }
       },
       showgrid: true,
@@ -1099,7 +1100,7 @@ export function renderBestScore(paths: Path[]) {
     },
     yaxis: {
       title: {
-        text: "Path Score (Lower is Better)",
+        text: t("pathScoreLowerBetter"),
         font: { color: "#a3a3a3" }
       },
       showgrid: true,
