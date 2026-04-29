@@ -87,9 +87,9 @@ type MetadataFabric func(n Node) any
 func CreateVertices(nodes []Node, mf MetadataFabric) ([]*graph.Vertex, map[int]*graph.Vertex) {
 	vertices := make([]*graph.Vertex, 0, len(nodes))
 	vertexMap := make(map[int]*graph.Vertex, len(nodes))
-
-	for _, n := range nodes {
-		name := strconv.Itoa(n.ID)
+	vertexNames := GenerateVertexNameSequence(len(nodes))
+	for i, n := range nodes {
+		name := vertexNames[i]
 		v := graph.NewVertex(name)
 		v.SetMetadata(mf(n))
 		vertices = append(vertices, v)
@@ -124,6 +124,32 @@ func BuildCompleteGraph(
 	}
 
 	return edges
+}
+
+func GenerateVertexNameSequence(count int) []string {
+	if count <= 0 {
+		return []string{}
+	}
+
+	result := make([]string, count)
+
+	for i := 0; i < count; i++ {
+		result[i] = vertexName(i + 1)
+	}
+
+	return result
+}
+
+func vertexName(n int) string {
+	result := ""
+
+	for n > 0 {
+		n--
+		result = string(rune('A'+n%26)) + result
+		n /= 26
+	}
+
+	return result
 }
 
 // MustGetCoord returns coordinate at index, panics if out of range

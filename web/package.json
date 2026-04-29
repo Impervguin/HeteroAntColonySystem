@@ -3,12 +3,17 @@
         "build": "tsc && esbuild ts/app.ts ts/ui.ts --bundle --minify --outdir=static/js --platform=browser --format=esm --inject:./ts/shims/reflect-shim.js"
     },
     "devDependencies": {
+        "@types/plotly.js-dist-min": "^2.3.4",
         "esbuild": "^0.28.0",
         "typescript": "^6.0.3"
     },
     "dependencies": {
+        "assert": "^2.1.0",
+        "buffer": "^6.0.3",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.15.1",
-        "reflect-metadata": "^0.2.2"
+        "plotly.js-dist-min": "^3.5.0",
+        "reflect-metadata": "^0.2.2",
+        "stream": "^0.0.3"
     }
 }

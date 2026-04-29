@@ -143,7 +143,7 @@ func (s *HacoMutationStrategy) Get() colony.MutationStrategy {
 	case "uniform":
 		return mutation.NewUniformMutationStrategy(*s.Min, *s.Max)
 	case "gauss":
-		return mutation.NewGaussMutationStrategy(*s.Mean, *s.Std)
+		return mutation.NewGaussMutationStrategy(*s.Std, *s.Mean)
 	default:
 		panic("unknown mutation strategy")
 	}

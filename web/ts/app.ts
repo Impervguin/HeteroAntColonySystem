@@ -14,6 +14,9 @@ import { HacoRunDetailsResponse } from "./models/haco/response.js"
 import { Graph } from "./models/graph.js"
 import { HacoFormInput, buildHacoRequest } from "./form.js"
 
+import './shims/global-shim.js'
+import * as Plotly from 'plotly.js-dist-min';
+
 // =======================
 // State Management
 // =======================
