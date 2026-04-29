@@ -7,7 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"HeteroAntColonySystem/api/utils/ginerr"
+	"HeteroAntColonySystem/web/router/dto"
 	"HeteroAntColonySystem/web/templates"
+	"HeteroAntColonySystem/web/templates/components"
 )
 
 type Router struct {
@@ -42,6 +44,9 @@ func Setup(r *gin.Engine, apiServer, apiBase string) {
 		proxy := &httputil.ReverseProxy{Director: director}
 		proxy.ServeHTTP(c.Writer, c.Request)
 	})
+
+	rd := r.Group("/render")
+	rd.POST("/graph-stats", router.RenderGraphStats)
 }
 
 var (
@@ -86,4 +91,14 @@ func (r *Router) Get(c *gin.Context) {
 	pd := defaultPageData
 	pd.Files = files.Files
 	templates.Page(pd).Render(c.Request.Context(), c.Writer)
+}
+
+func (r *Router) RenderGraphStats(c *gin.Context) {
+	req, err := dto.DeserializeGraphStatsRequest(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ginerr.ErrJSONBody(err))
+		return
+	}
+
+	components.GraphStats(req).Render(c.Request.Context(), c.Writer)
 }

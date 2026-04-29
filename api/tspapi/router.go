@@ -26,6 +26,7 @@ func NewRouter(r *gin.RouterGroup, parser *tsplib.TSPLIBParser, fs fs.FS) *TSPRo
 	gr.GET("/:file", tsp.GetTSP)
 	gr.GET("/files", tsp.ListTSP)
 	gr.POST("/parse", tsp.ParseTSP)
+	gr.POST("/stats", tsp.GraphStats)
 
 	return tsp
 }
@@ -116,4 +117,15 @@ func (r *TSPRouter) ListTSP(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.SerializeListTSPResponse(c, fnames))
+}
+
+func (r *TSPRouter) GraphStats(c *gin.Context) {
+	g, err := dto.DeserializeGetGraphStatsRequest(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, ginerr.ErrJSONBody(err))
+		return
+	}
+
+	stats := CalculateGraphStats(g)
+	c.JSON(http.StatusOK, dto.SerializeGetGraphStatsResponse(c, stats))
 }

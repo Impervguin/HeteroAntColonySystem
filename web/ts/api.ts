@@ -1,6 +1,6 @@
 import { validateDto } from "./utils/validate.js"
 
-import { ParseTSPResponse, GetTSPResponse, ListTSPResponse } from "./models/tsp.js"
+import { ParseTSPResponse, GetTSPResponse, ListTSPResponse, GraphStatsResponse, GraphStatsRequest } from "./models/tsp.js"
 import { HacoRunRequest } from "./models/haco/request.js"
 import { HacoRunDetailsResponse } from "./models/haco/response.js"
 
@@ -48,4 +48,23 @@ export async function runHacoDetails(request: HacoRunRequest): Promise<HacoRunDe
   })
 
   return validateDto(HacoRunDetailsResponse, await safeJson(res))
+}
+
+export async function graphStats(request: GraphStatsRequest): Promise<GraphStatsResponse> {
+  const res = await fetch(`${getApiBase()}/tsp/stats`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request)
+  })
+
+  return validateDto(GraphStatsResponse, await safeJson(res))
+}
+
+export async function renderGraphStats(request: GraphStatsResponse): Promise<string> {
+  const res = await fetch(`/render/graph-stats`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request)
+  })
+  return await res.text()
 }

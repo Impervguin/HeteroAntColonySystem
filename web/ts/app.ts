@@ -2,6 +2,8 @@ import {
   parseTSP,
   getTSP,
   runHacoDetails,
+  graphStats,
+  renderGraphStats
 } from "./api.js"
 
 import {
@@ -10,6 +12,7 @@ import {
 } from "./render.js"
 
 import { HacoRunRequest } from "./models/haco/request.js"
+import { GraphStatsRequest, GraphStatsResponse } from "./models/tsp.js"
 import { HacoRunDetailsResponse } from "./models/haco/response.js"
 import { Graph } from "./models/graph.js"
 import { HacoFormInput, buildHacoRequest } from "./form.js"
@@ -139,6 +142,8 @@ async function handleFileUpload(file: File) {
     currentFilename = file.name
     currentResult = null
     
+    await updateGraphStats(currentGraph)
+    
     // Render initial graph without path
     renderGraph(currentGraph)
     
@@ -167,6 +172,8 @@ async function handleFileChoose(file: string) {
     currentGraph = response.graph
     currentFilename = file
     currentResult = null
+
+    await updateGraphStats(currentGraph)
     
     // Render initial graph without path
     renderGraph(currentGraph)
@@ -224,6 +231,44 @@ async function runHaco() {
 // UI State Management
 // =======================
 
+async function updateGraphStats(graph: Graph | null) {
+  try {
+    const container = document.getElementById("graph-stats")!
+    if (graph === null) {
+      container.innerHTML = ""
+      return
+    }
+
+    const request: GraphStatsRequest = {
+      graph: graph
+    }
+    
+    const stats = await graphStats(request)
+    
+    // Обновляем рекомендации в форме
+    if (stats.recommended_pheromone_multiplier) {
+      const pheromoneInput = document.getElementById("pheromone-multiplier") as HTMLInputElement
+      const evaporationInput = document.getElementById("evaporation-rate") as HTMLInputElement
+      
+      // Показываем рекомендацию как placeholder или предзаполняем
+      if (pheromoneInput && !pheromoneInput.value) {
+        pheromoneInput.placeholder = `${stats.recommended_pheromone_multiplier.toFixed(2)}`
+      }
+      
+      if (evaporationInput && !evaporationInput.value) {
+        evaporationInput.placeholder = `${stats.recommended_evaporation_rate.toFixed(3)}`
+      }
+    }
+    
+    // Отправляем статистику на бэкенд для рендеринга компонента
+    const newHTML = await renderGraphStats(stats)
+    
+    container.innerHTML = newHTML
+  } catch (error) {
+    console.error("Failed to load graph statistics:", error)
+  }
+}
+
 function updateMutationFields() {
   const mutationType = elements.mutationType.value
   const uniformFields = [elements.mutationMin, elements.mutationMax]
@@ -277,54 +322,14 @@ function setupEventListeners() {
   updateSelectionFields()
 }
 
-// =======================
-// Keyboard Shortcuts
-// =======================
-
-function setupKeyboardShortcuts() {
-  document.addEventListener("keydown", (e) => {
-    // Ctrl/Cmd + Enter to run
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-      e.preventDefault()
-      if (elements.runBtn.disabled === false) {
-        runHaco()
-      }
-    }
-    
-    // Ctrl/Cmd + O to open file
-    if ((e.ctrlKey || e.metaKey) && e.key === "o") {
-      e.preventDefault()
-      elements.fileInput.click()
-    }
-  })
-}
 
 // =======================
 // Initialization
 // =======================
 
-async function loadDefaultGraph() {
-  // Optional: Load a default TSP file if available
-  // Uncomment and adjust if you have a default file on server
-  /*
-  try {
-    const response = await getTSP("default.tsp")
-    if (response.graph) {
-      currentGraph = response.graph
-      renderGraph(currentGraph)
-      console.log("Default graph loaded")
-    }
-  } catch (error) {
-    console.log("No default graph available")
-  }
-  */
-}
-
 function init() {
   console.log("Initializing HACO Visualizer...")
   setupEventListeners()
-  setupKeyboardShortcuts()
-  loadDefaultGraph()
   
   // Clear initial plots
   const plotIds = ["graph", "pheromone-graph", "heatmap", "coeffs", "score"]

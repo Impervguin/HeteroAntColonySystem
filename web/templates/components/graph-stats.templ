@@ -1,0 +1,53 @@
+package components
+
+import (
+	"fmt"
+    dto "HeteroAntColonySystem/web/router/dto"
+)
+
+func formatNumber(n float64) string {
+	if n >= 1e12 {
+		return fmt.Sprintf("%.2e", n)
+	}
+	if n >= 1e6 {
+		return fmt.Sprintf("%.2fM", n/1e6)
+	}
+	if n >= 1e3 {
+		return fmt.Sprintf("%.2fK", n/1e3)
+	}
+	return fmt.Sprintf("%.0f", n)
+}
+
+func formatPossibleSolutions(solutions float64) string {
+	if solutions >= 1e100 {
+		return "∞ (>10^100)"
+	}
+	if solutions >= 1e6 {
+		return fmt.Sprintf("%.2e", solutions)
+	}
+	return fmt.Sprintf("%.0f", solutions)
+}
+
+
+
+templ GraphStats(data *dto.GraphStatsRequest) {
+	<div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow" id="graph-stats-container">
+		<h2 class="text-xl font-semibold mb-4 text-amber-300">Graph Statistics</h2>
+		if data != nil {
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Basic Info -->
+
+                @stat("Nodes", fmt.Sprintf("%d", data.NodesCount), "vertices", 1)
+                @stat("Edges", fmt.Sprintf("%d", data.EdgesCount), "connections", 1)
+                @stat("Possible Solutions", formatPossibleSolutions(data.PossibleSolutions), "", 1)
+                @stat("Avg Edge Weight", fmt.Sprintf("%.2f", data.AvgEdgeWeight), "units", 1)
+                @stat("Min Edge Weight", fmt.Sprintf("%.2f", data.MinEdgeWeight), "", 1)
+                @stat("Max Edge Weight", fmt.Sprintf("%.2f", data.MaxEdgeWeight), "", 1)
+                @stat("Expected Path Length", fmt.Sprintf("%.2f", data.ExpectedPathLength), "avg weight × nodes", 2)
+                @stat("Recommended Q", fmt.Sprintf("%.2f", data.RecommendedPheromoneMultiplier), "pheromone multiplier", 2)
+                @stat("Recommended ρ", fmt.Sprintf("%.3f", data.RecommendedEvaporationRate), "evaporation rate", 2)
+                
+            </div>
+        }
+	</div>
+}
