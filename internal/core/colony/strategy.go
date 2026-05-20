@@ -7,7 +7,7 @@ type ParentSelectionStrategy interface {
 }
 
 type CrossoverStrategy interface {
-	Crossover(p1, p2 ant.AntView) *ant.HeteroAnt
+	Crossover(p1, p2 ant.AntView) []*ant.HeteroAnt
 }
 
 type MutationStrategy interface {

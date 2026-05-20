@@ -23,13 +23,14 @@ type HeteroAnt struct {
 	pheromoneApply PheromoneApplyingStrategy
 
 	// Runtime state (initialized in Prepare)
-	g       *graph.Graph
-	pm      *pheromone.PheromoneMap
-	current *graph.Vertex
-	path    []*graph.Vertex
-	visited map[*graph.Vertex]struct{}
-	done    bool
-	score   float64
+	g        *graph.Graph
+	pm       *pheromone.PheromoneMap
+	current  *graph.Vertex
+	path     []*graph.Vertex
+	visited  map[*graph.Vertex]struct{}
+	done     bool
+	score    float64
+	sumScore float64
 }
 
 // NewHeteroAnt creates a new heterogeneous ant with the given parameters and strategies.
@@ -40,6 +41,7 @@ func NewHeteroAnt(alpha, beta, pherMultiplier float64, chooseNext PathChoiceStra
 		pheromoneMultiplier: pherMultiplier,
 		chooseNext:          chooseNext,
 		pheromoneApply:      pherAppl,
+		sumScore:            0,
 	}
 }
 
@@ -71,6 +73,9 @@ func (a *HeteroAnt) PheromoneApplyStrategy() PheromoneApplyingStrategy {
 // Prepare initializes the ant for a new tour on the given graph.
 // It resets the ant's state and selects a random starting vertex.
 func (a *HeteroAnt) Prepare(g *graph.Graph, pm *pheromone.PheromoneMap) {
+	if a.path != nil {
+		a.sumScore += a.score
+	}
 	a.g = g
 	a.pm = pm
 	a.current = g.RandomVertex()
@@ -152,6 +157,10 @@ func (a *HeteroAnt) Score() float64 {
 	}
 
 	return a.score
+}
+
+func (a *HeteroAnt) SumScore() float64 {
+	return a.sumScore
 }
 
 // Path returns the vertices in the ant's path.

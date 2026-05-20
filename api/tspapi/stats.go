@@ -35,8 +35,8 @@ func CalculateGraphStats(g *graph.Graph) *dto.GraphStatsResponse {
 	expectedPathLength := avgEdgeWeight * float64(g.Len())
 	possibleSolutions := factorial(g.Len()-1) / 2
 
-	recommendedPheromoneMultiplier := avgEdgeWeight * (math.Sqrt(float64(g.Len())) / 2)
-	recommendedEvaporationRate := math.Min(0.5, math.Max(0.05, float64(g.Len())/10.))
+	recommendedPheromoneMultiplier := avgEdgeWeight * (math.Sqrt(float64(g.Len())) * 2)
+	recommendedEvaporationRate := math.Min(0.3, math.Max(0.05, float64(g.Len())/10.))
 	return &dto.GraphStatsResponse{
 		NodesCount:                     uint(g.Len()),
 		EdgesCount:                     uint64(g.EdgeLen()),

@@ -53,3 +53,9 @@ func WithEvaporationRate(rate float64) ColonyOption {
 		c.evaporationRate = rate
 	}
 }
+
+func WithObservers(observers ...AntColonyObserver) ColonyOption {
+	return func(c *AntColony) {
+		c.observers = observers
+	}
+}

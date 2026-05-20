@@ -16,6 +16,7 @@ type AntView interface {
 
 	Path() []*graph.Vertex
 	Score() float64
+	SumScore() float64
 
 	Alpha() float64
 	Beta() float64

@@ -21,7 +21,7 @@ func (s *BestSelectionStrategy) SelectParents(ants []ant.AntView, n uint) []ant.
 	}
 
 	slices.SortFunc(tmp, func(a, b ant.AntView) int {
-		return int(a.Score() - b.Score())
+		return int(a.SumScore() - b.SumScore())
 	})
 
 	return tmp[:n]

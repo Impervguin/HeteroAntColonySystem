@@ -25,6 +25,12 @@ type AntColony struct {
 	bestPerGeneration []*Ant
 	bestTour          []*graph.Vertex
 	bestScore         float64
+
+	observers []AntColonyObserver
+}
+
+type AntColonyObserver interface {
+	Observe(c *AntColony)
 }
 
 func NewAntColony(gr *graph.Graph, opts ...ColonyOption) (*AntColony, error) {
@@ -38,6 +44,7 @@ func NewAntColony(gr *graph.Graph, opts ...ColonyOption) (*AntColony, error) {
 		pheromoneMultiplier: DefaultPheromoneMultiplier,
 		evaporationRate:     DefaultEvaporationRate,
 		initialPheromone:    DefaultInitialPheromone,
+		observers:           make([]AntColonyObserver, 0),
 	}
 	for _, opt := range opts {
 		opt(c)
@@ -87,6 +94,11 @@ func (c *AntColony) Run() {
 
 		// Update best ants
 		c.updateBest()
+
+		// Observe current state
+		for _, obs := range c.observers {
+			obs.Observe(c)
+		}
 
 		// Copying ants from previous generation
 		c.prepareGeneration()

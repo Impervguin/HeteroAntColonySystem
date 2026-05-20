@@ -29,6 +29,7 @@ func NewGraph(vertCount uint) *Graph {
 		sourceMap: make(map[*Vertex][]*Edge, vertCount),
 		targetMap: make(map[*Vertex][]*Edge, vertCount),
 		dist:      make(map[*Vertex]map[*Vertex]*Edge, vertCount),
+		mut:       sync.RWMutex{},
 	}
 	return g
 }

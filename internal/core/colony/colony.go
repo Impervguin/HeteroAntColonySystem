@@ -190,6 +190,8 @@ func (c *HeteroAntColony) Run() error {
 		// Update global best if needed
 		if c.best == nil || bestInGen.Score() < c.best.Score() {
 			c.best = bestInGen.FullCopy()
+			// c.score = c.best.Score()
+			// fmt.Println("New score:", c.score)
 		}
 
 		// Phase 4: Evaporate pheromones
@@ -249,20 +251,33 @@ func (c *HeteroAntColony) evaporatePheromones() {
 // prepareNextGeneration creates new ants based on selection, crossover, and mutation.
 func (c *HeteroAntColony) prepareNextGeneration(parents []ant.AntView) {
 	// Crossover
-	offspring := make([]*ant.HeteroAnt, 0, c.colonySize)
-	for i := 0; uint(i) < c.colonySize; i++ {
+	offspringCount := int(c.colonySize) - len(parents)
+	offspring := make([]*ant.HeteroAnt, 0, offspringCount)
+	for len(offspring) < offspringCount {
 		ind1 := rand.Intn(len(parents) - 1)
 		ind2 := rand.Intn(len(parents) - 1)
 		if ind1 == ind2 {
 			ind2++
 		}
 		p1, p2 := parents[ind1], parents[ind2]
-		offspring = append(offspring, c.crossover.Crossover(p1, p2))
+		offspring = append(offspring, c.crossover.Crossover(p1, p2)...)
 	}
+	offspring = offspring[:offspringCount]
 
 	// Mutation
-	for i := 0; uint(i) < c.colonySize; i++ {
+	for i := 0; i < offspringCount; i++ {
 		offspring[i] = c.mutation.Mutate(offspring[i])
+	}
+
+	parentCopy := make([]*ant.HeteroAnt, 0, len(parents))
+	for _, p := range parents {
+		parentCopy = append(parentCopy, ant.NewHeteroAnt(
+			p.Alpha(),
+			p.Beta(),
+			p.PheromoneMultiplier(),
+			p.PathStrategy(),
+			p.PheromoneApplyStrategy(),
+		))
 	}
 
 	// Replace ants
