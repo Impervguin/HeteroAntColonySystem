@@ -1,14 +1,13 @@
 \include{latex-parts/preambula}
 
 \begin{document}	
-	%\includepdf[page=1]{tz}
-	\setcounter{page}{2}
+	\includepdf[page=1]{titulvkr}
+	\setcounter{page}{5}
 	
-	%\include{latex-parts/referat}
-	\def\contentsname{\begin{center} \vspace{-3.4cm} СОДЕРЖАНИЕ\end{center}}
+	\include{latex-parts/referat}
+	%\def\contentsname{\begin{center} \vspace{-3.4cm} СОДЕРЖАНИЕ\end{center}}
+	\def\contentsname{\vspace{-2.9cm}\ssrnotoc{СОДЕРЖАНИЕ}}
 	
-	\setlength{\cftsecindent}{0cm}
-	\setlength{\cftsubsecindent}{0cm}
 	\tableofcontents
 
 	
@@ -18,10 +17,10 @@
 	\include{latex-parts/design-part}
 	\include{latex-parts/tech-part}
 	\include{latex-parts/experimental-part}
-	%\include{latex-parts/conclusion}
+	\include{latex-parts/conclusion}
 	
 	\def\bibname{\begin{center}\vspace{-1.3cm}\Large СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ\end{center}}
 	\include{latex-parts/links}
-	%\ssr{ПРИЛОЖЕНИЕ А}
+	\include{latex-parts/additions}
 	\include{latex-parts/additionsB}
 \end{document}

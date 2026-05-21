@@ -67,7 +67,7 @@ latex_lines.append("\\textbf{Файл} & $N_g$ & \\textbf{Алгоритм} &  $
 latex_lines.append("\\hline")
 latex_lines.append("\\endfirsthead")
 latex_lines.append("")
-latex_lines.append("\\caption[]{Результаты сходимости (продолжение)} \\\\")
+latex_lines.append("\\caption*{Продолжение таблицы~\\ref{tbl:convergence}} \\\\")
 latex_lines.append("\\hline")
 latex_lines.append("\\textbf{Файл} & $N_g$ & \\textbf{Алгоритм} &  $\mu_r$ & $\sigma_r$ & $ITB_{1/2}$ & $\mu_{t}$, мс \\\\")
 latex_lines.append("\\hline")
@@ -207,7 +207,7 @@ legend_elements.extend([
 ax1.legend(handles=legend_elements, loc='upper right', fontsize=10)
 
 plt.tight_layout()
-plt.savefig('out/convergence/itb_boxplots.png', dpi=300, bbox_inches='tight')
+plt.savefig('out/convergence/itb_boxplots.png', dpi=200, bbox_inches='tight')
 print("✓ График 1 сохранен в 'out/convergence/itb_boxplots.png'")
 plt.close(fig1)
 
@@ -274,7 +274,7 @@ ax2.axvline(x=min_itb, color='gray', linestyle=':', alpha=0.5, linewidth=1)
 ax2.axhline(y=max_score, color='gray', linestyle=':', alpha=0.5, linewidth=1)
 
 plt.tight_layout()
-plt.savefig('out/convergence/itb_score_scatter.png', dpi=300, bbox_inches='tight')
+plt.savefig('out/convergence/itb_score_scatter.png', dpi=200, bbox_inches='tight')
 print("✓ График 2 сохранен в 'out/convergence/itb_score_scatter.png'")
 plt.close(fig2)
 

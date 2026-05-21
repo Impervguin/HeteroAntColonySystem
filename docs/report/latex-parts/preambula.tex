@@ -1,4 +1,4 @@
-\documentclass[a4paper, 12pt]{extreport}
+\documentclass[a4paper, 14pt]{extreport}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
 \usepackage{amssymb,amsfonts,amsmath,mathtext,cite,enumerate,float}
@@ -23,15 +23,12 @@
 \usepackage{enumitem}
 \usepackage{multirow}
 \usepackage{longtable}
+\usepackage{totcount}
 
 \usepackage[figure,table]{totalcount}
 \usepackage{lastpage}
 
 \setlist{nosep}
-
-\newcommand{\ssr}[1]{\begin{center}
-		\LARGE\bfseries{#1}
-	\end{center} \addcontentsline{toc}{chapter}{#1}  }
 
 \makeatletter
 \renewcommand\LARGE{\@setfontsize\LARGE{22pt}{20}}
@@ -49,6 +46,14 @@
 \titlespacing{\subsection}{12.5mm}{10pt}{10pt}
 \titlespacing{\subsubsection}{12.5mm}{10pt}{10pt}
 
+\newcommand{\ssr}[1]{\begin{center}
+		\LARGE\bfseries{#1}
+	\end{center} \addcontentsline{toc}{chapter}{#1}  }
+
+\newcommand{\ssrnotoc}[1]{\begin{center}
+		\LARGE\bfseries{#1}
+\end{center}}
+
 \makeatletter
 \renewcommand{\@biblabel}[1]{#1.}
 \makeatother
@@ -62,19 +67,26 @@
 %\titlespacing*{\subsection}{0pt}{\baselineskip}{\baselineskip}
 
 \geometry{left=30mm}
-\geometry{right=10mm}
+\geometry{right=15mm}
 \geometry{top=20mm}
 \geometry{bottom=20mm}
 
 \onehalfspacing
 
 \renewcommand{\theenumi}{\arabic{enumi}}
-\renewcommand{\labelenumi}{\arabic{enumi}\text{)}}
-\renewcommand{\theenumii}{.\arabic{enumii}}
-\renewcommand{\labelenumii}{\asbuk{enumii}\text{)}}
-\renewcommand{\theenumiii}{.\arabic{enumiii}}
-\renewcommand{\labelenumiii}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}.}
+\renewcommand{\labelenumi}{\theenumi)}
 
+\renewcommand{\theenumii}{\arabic{enumi}.\arabic{enumii}}
+\renewcommand{\labelenumii}{\theenumii)}
+
+\renewcommand{\theenumiii}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}}
+\renewcommand{\labelenumiii}{\theenumiii)}
+
+\setlength{\cftsecindent}{0cm}
+\setlength{\cftsubsecindent}{0cm}
+\setcounter{tocdepth}{2}
+\setlength{\cftbeforechapskip}{0pt}
+\setlength{\cftbeforesecskip}{0pt}      
 \renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
 
 \addto\captionsrussian{\renewcommand{\figurename}{Рисунок}}
@@ -165,10 +177,11 @@
 	numberstyle=\scriptsize,           % размер шрифта для номеров строк
 	stepnumber=1,                   % размер шага между двумя номерами строк
 %	numbersep=5pt,                % как далеко отстоят номера строк от подсвечиваемого кода
+	xleftmargin=15pt,
 	showspaces=false,            % показывать или нет пробелы специальными отступами
 	showstringspaces=false,      % показывать или нет пробелы в строках
 	showtabs=false,             % показывать или нет табуляцию в строках
-	frame=single,              % рисовать рамку вокруг кода
+	%frame=single,              % рисовать рамку вокруг кода
 	tabsize=2,                 % размер табуляции по умолчанию равен 2 пробелам
 	captionpos=t,              % позиция заголовка вверху [t] или внизу [b] 
 	breaklines=true,           % автоматически переносить строки (да\нет)
@@ -195,12 +208,25 @@
 
 \frenchspacing
 
-\makeatletter
-\renewcommand*{\l@chapter}[2]{%
-	\ifnum\c@tocdepth>\m@ne
-	\addpenalty{-\@highpenalty}%
-	\vskip 1.0em \@plus\p@
-	\@dottedtocline{0}{0pt}{2.3em}{\bfseries #1}{\bfseries #2}%
+%\makeatletter
+%\renewcommand*{\l@chapter}[2]{%
+%	\ifnum\c@tocdepth>\m@ne
+%	\addpenalty{-\@highpenalty}%
+%	\vskip 1.0em \@plus\p@
+%	\@dottedtocline{0}{0pt}{2.3em}{\bfseries #1}{\bfseries #2}%
+%	\fi
+%}
+%\makeatother
+
+\AtBeginEnvironment{longtable}{\fontsize{11}{13}\selectfont}
+
+\newtotcounter{totalbib}
+\let\oldbibitem\bibitem
+\renewcommand{\bibitem}[2][]{%
+	\stepcounter{totalbib}%
+	\if\relax\detokenize{#1}\relax
+	\oldbibitem{#2}%
+	\else
+	\oldbibitem[#1]{#2}%
 	\fi
 }
-\makeatother

@@ -79,7 +79,7 @@ latex_table = """\\begin{longtable}{|p{0.05\\textwidth}|p{0.15\\textwidth}|p{0.1
 \\textbf{№} & \\textbf{Селекция} & \\textbf{Кроссинговер} & \\textbf{Мутация} & \\textbf{Средний ранг} & \\textbf{$\\mu_{err}$} & \\textbf{$\\sigma_{err}$} \\\\
 \\hline
 \\endfirsthead
-\\caption[]{Ранжирование алгоритмов (продолжение)} \\\\
+\\caption*{Продолжение таблицы~\\ref{tbl:algorithm_ranking}} \\\\
 \\hline
 \\textbf{№} & \\textbf{Селекция} & \\textbf{Кроссинговер} & \\textbf{Мутация} & \\textbf{Средний ранг} & \\textbf{$\\mu_{err}$} & \\textbf{$\\sigma_{err}$} \\\\
 \\hline
@@ -117,7 +117,7 @@ for file_name in file_stats['file_clean'].unique():
     variations_latex += f"\\caption{{Результаты для задачи {file_name}. Оптимальное решение {best_score:.2f}}}\\label{{tbl:{file_name}}} \\\\\n\\hline\n"
     variations_latex += "\\textbf{№} & \\textbf{Селекция} & \\textbf{Кроссинговер} & \\textbf{Мутация} & \\textbf{Среднее} & \\textbf{СКО} & \\textbf{RSE (\\%)} \\\\\n\\hline\n"
     variations_latex += "\\endfirsthead\n"
-    variations_latex += f"\\caption[]{{Результаты для задачи {file_name} (продолжение)}} \\\\\n\\hline\n"
+    variations_latex += f"\\caption*{{Продолжение таблицы~\\ref{{tbl:{file_name}}}}} \\\\\n\\hline\n"
     variations_latex += "\\textbf{№} & \\textbf{Селекция} & \\textbf{Кроссинговер} & \\textbf{Мутация} & \\textbf{Среднее} & \\textbf{СКО} & \\textbf{RSE (\\%)} \\\\\n\\hline\n"
     variations_latex += "\\endhead\n\\hline\n\\endfoot\n\\endlastfoot\n"
     
@@ -156,7 +156,7 @@ ax_rank.grid(True, axis='y', linestyle='--', alpha=0.6, linewidth=0.8)
 ax_rank.set_axisbelow(True)
 
 plt.tight_layout()
-plt.savefig('out/haco/rank.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.savefig('out/haco/rank.png', dpi=200, bbox_inches='tight', facecolor='white')
 plt.show()
 
 rank_pivot = agg.pivot_table(index='name_ru', columns='file_clean', values='rank', aggfunc='first')
@@ -192,7 +192,7 @@ cbar = plt.colorbar(im, ax=ax_heatmap)
 cbar.set_label('Ранг', fontsize=12, fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('out/haco/heatmap.png', dpi=300, bbox_inches='tight', facecolor='white')
+plt.savefig('out/haco/heatmap.png', dpi=200, bbox_inches='tight', facecolor='white')
 plt.show()
 
 print("\nГрафики сохранены:")
