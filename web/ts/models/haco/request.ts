@@ -9,7 +9,8 @@ import { Graph } from "../graph.js"
 import {
   BaseSelection,
   BestSelection,
-  TournamentSelection
+  TournamentSelection,
+  RouletteSelection
 } from "./selection.js"
 
 import {
@@ -18,7 +19,12 @@ import {
   GaussMutation
 } from "./mutation.js"
 
-import { ArithmeticCrossover } from "./crossover.js"
+import {
+  BaseCrossover,
+  ArithmeticCrossover,
+  SBXCrossover,
+  BLXCrossover
+} from "./crossover.js"
 import { BaseOptimisation } from "./optimisation.js"
 
 export class HacoRunRequest {
@@ -59,7 +65,8 @@ export class HacoRunRequest {
       property: "type",
       subTypes: [
         { value: BestSelection, name: "best" },
-        { value: TournamentSelection, name: "tournament" }
+        { value: TournamentSelection, name: "tournament" },
+        { value: RouletteSelection, name: "roulette" }
       ]
     },
     keepDiscriminatorProperty: true
@@ -67,8 +74,18 @@ export class HacoRunRequest {
   selection!: BaseSelection
 
   @ValidateNested()
-  @Type(() => ArithmeticCrossover)
-  crossover!: BaseSelection
+  @Type(() => BaseCrossover, {
+    discriminator: {
+      property: "type",
+      subTypes: [
+        { value: ArithmeticCrossover, name: "arithmetic" },
+        { value: SBXCrossover, name: "sbx" },
+        { value: BLXCrossover, name: "blx" }
+      ]
+    },
+    keepDiscriminatorProperty: true
+  })
+  crossover!: BaseCrossover
 
   @ValidateNested()
   @Type(() => BaseMutation, {

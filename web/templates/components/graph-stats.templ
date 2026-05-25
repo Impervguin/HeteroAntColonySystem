@@ -44,9 +44,10 @@ templ GraphStats(data *dto.GraphStatsRequest) {
                 @stat("minEdgeWeight", fmt.Sprintf("%.2f", data.MinEdgeWeight), "", 1)
                 @stat("maxEdgeWeight", fmt.Sprintf("%.2f", data.MaxEdgeWeight), "", 1)
                 @stat("expectedPathLength", fmt.Sprintf("%.2f", data.ExpectedPathLength), "avgWeightNodes", 2)
-                @stat("recommendedQ", fmt.Sprintf("%.2f", data.RecommendedPheromoneMultiplier), "pheromoneMultiplier", 2)
-                @stat("recommendedRho", fmt.Sprintf("%.3f", data.RecommendedEvaporationRate), "evaporationRate", 2)
-                
+                @stat("recommendedQ", fmt.Sprintf("%.2f", data.RecommendedPheromoneMultiplier), "pheromoneMultiplier", 1)
+                @stat("recommendedRho", fmt.Sprintf("%.3f", data.RecommendedEvaporationRate), "evaporationRate", 1)
+				@stat("recommendedInitialPheromone", fmt.Sprintf("%.2f", data.RecommendedInitialPheromone), "rinitialPheromone", 2)
+
             </div>
         }
 	</div>

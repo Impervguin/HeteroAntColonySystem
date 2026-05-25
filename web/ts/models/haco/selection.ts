@@ -2,7 +2,7 @@ import { IsIn, IsNumber, IsString, ValidateIf } from "class-validator"
 
 export abstract class BaseSelection {
   @IsString()
-  @IsIn(["best", "tournament"])
+  @IsIn(["best", "tournament", "roulette"])
   type!: string
 }
 
@@ -21,4 +21,8 @@ export class TournamentSelection extends BaseSelection {
   @ValidateIf(o => o.type === "tournament")
   @IsNumber()
   k!: number
+}
+
+export class RouletteSelection extends BaseSelection {
+  type: "roulette" = "roulette"
 }

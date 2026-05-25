@@ -39,7 +39,21 @@ mutation.addEventListener("change", () => {
   toggle(gauss, mutation.value === "gauss")
 })
 
+// =======================
+// CROSSOVER
+// =======================
+
+const crossover = document.getElementById("crossover-type") as HTMLSelectElement
+const sbx = document.getElementById("crossover-sbx")!
+const blx = document.getElementById("crossover-blx")!
+
+crossover.addEventListener("change", () => {
+  toggle(sbx, crossover.value === "sbx")
+  toggle(blx, crossover.value === "blx")
+})
+
 // INIT (важно)
 selection.dispatchEvent(new Event("change"))
 mutation.dispatchEvent(new Event("change"))
+crossover.dispatchEvent(new Event("change"))
 graphMode.dispatchEvent(new Event("change"))

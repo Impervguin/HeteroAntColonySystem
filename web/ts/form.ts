@@ -1,8 +1,8 @@
 
 import { Graph } from "./models/graph.js"
 import { HacoRunRequest } from "./models/haco/request.js"
-import { TournamentSelection, BestSelection, BaseSelection } from "./models/haco/selection.js"
-import { ArithmeticCrossover, BaseCrossover } from "./models/haco/crossover.js"
+import { TournamentSelection, BestSelection, RouletteSelection, BaseSelection } from "./models/haco/selection.js"
+import { ArithmeticCrossover, SBXCrossover, BLXCrossover, BaseCrossover } from "./models/haco/crossover.js"
 import { UniformMutation, GaussMutation, BaseMutation } from "./models/haco/mutation.js"
 import { BaseOptimisation, NoOpLocalOptimisation, TwoOptLocalOptimisation } from "./models/haco/optimisation.js"
 import { validateDto } from "./utils/validate.js"
@@ -19,9 +19,11 @@ export type HacoFormInput = {
   generation_period: number
   parent_count: number
 
-  crossover_type: "arithmetic"
+  crossover_type: "arithmetic" | "sbx" | "blx"
+  crossover_eta: number | undefined
+  crossover_gamma: number | undefined
   
-  selection_type: "best" | "tournament"
+  selection_type: "best" | "tournament" | "roulette"
   tournament_k: number | undefined
   
   mutation_type: "uniform" | "gauss"
@@ -38,6 +40,8 @@ export async function buildHacoRequest(graph: Graph, input: HacoFormInput): Prom
     let selection: BaseSelection
     if (input.selection_type === "tournament") {
         selection = new TournamentSelection(input.tournament_k!)
+    } else if (input.selection_type === "roulette") {
+        selection = new RouletteSelection()
     } else {
         selection = new BestSelection()
     }
@@ -50,8 +54,10 @@ export async function buildHacoRequest(graph: Graph, input: HacoFormInput): Prom
     }
 
     let crossover: BaseCrossover
-    if (input.crossover_type === "arithmetic") {
-        crossover = new ArithmeticCrossover()
+    if (input.crossover_type === "sbx") {
+        crossover = new SBXCrossover(input.crossover_eta!)
+    } else if (input.crossover_type === "blx") {
+        crossover = new BLXCrossover(input.crossover_gamma!)
     } else {
         crossover = new ArithmeticCrossover()
     }

@@ -2,17 +2,21 @@ package components
 
 
 type StrategyBlockData struct {
-	SelectionType string
-	TournamentK uint
-
-	MutationType string
-	MutationMin float64
-	MutationMax float64
-	MutationMean float64
-	MutationStd float64
-
-	LocalOptimisation string
-}
+ 	SelectionType string
+ 	TournamentK uint
+ 
+ 	CrossoverType string
+ 	CrossoverEta  float64
+ 	CrossoverGamma float64
+ 
+ 	MutationType string
+ 	MutationMin float64
+ 	MutationMax float64
+ 	MutationMean float64
+ 	MutationStd float64
+ 
+ 	LocalOptimisation string
+ }
 
 templ StrategiesBlock(d StrategyBlockData) {
 <div class="bg-neutral-800 rounded-xl p-6 mb-6 shadow">
@@ -21,18 +25,39 @@ templ StrategiesBlock(d StrategyBlockData) {
 
  	<div class="grid grid-cols-4 gap-4">
 
- 		<!-- SELECTION -->
- 		<div class="gap-4">
- 			<label data-i18n="selection">Selection</label>
- 			<select id="selection-type" class="w-full bg-neutral-700 p-2 rounded">
- 				<option value="best" data-i18n-option="best">Best</option>
- 				<option value="tournament" data-i18n-option="tournament">Tournament</option>
- 			</select>
+  		<!-- SELECTION -->
+  		<div class="gap-4">
+  			<label data-i18n="selection">Selection</label>
+  			<select id="selection-type" class="w-full bg-neutral-700 p-2 rounded">
+				if d.SelectionType == "best" {
+					<option value="best" selected data-i18n-option="best">Best</option>
+				} else {
+					<option value="best" data-i18n-option="best">Best</option>
+				}
 
-            <div id="selection-tournament" class="hidden">
-                @input("tournament-k", "tournamentK", d.TournamentK)
-            </div>
- 		</div>
+				if d.SelectionType == "tournament" {
+					<option value="tournament" selected data-i18n-option="tournament">Tournament</option>
+				} else {
+					<option value="tournament" data-i18n-option="tournament">Tournament</option>
+				}
+
+				if d.SelectionType == "roulette" {
+					<option value="roulette" selected data-i18n-option="roulette">Roulette</option>
+				} else {
+					<option value="roulette" data-i18n-option="roulette">Roulette</option>
+				}
+  			</select>
+
+			if d.SelectionType == "tournament" {
+				<div id="selection-tournament">
+					@input("tournament-k", "tournamentK", d.TournamentK)
+				</div>
+			} else {
+				<div id="selection-tournament" class="hidden">
+					@input("tournament-k", "tournamentK", d.TournamentK)
+				</div>
+			}
+  		</div>
 
 
 
@@ -40,19 +65,42 @@ templ StrategiesBlock(d StrategyBlockData) {
  		<div>
  			<label data-i18n="mutation">Mutation</label>
  			<select id="mutation-type" class="w-full bg-neutral-700 p-2 rounded">
- 				<option value="uniform" data-i18n-option="uniform">Uniform</option>
- 				<option value="gauss" data-i18n-option="gauss">Gauss</option>
+				if d.MutationType == "uniform" {
+					<option value="uniform" selected data-i18n-option="uniform">Uniform</option>
+				} else {
+					<option value="uniform" data-i18n-option="uniform">Uniform</option>
+				}
+
+				if d.MutationType == "gauss" {
+					<option value="gauss" selected data-i18n-option="gauss">Gauss</option>
+				} else {
+					<option value="gauss" data-i18n-option="gauss">Gauss</option>
+				}
  			</select>
 
-            <div id="mutation-uniform" class="hidden">
-                @input("mutation-min", "min", d.MutationMin)
-                @input("mutation-max", "max", d.MutationMax)
-            </div>
-
-            <div id="mutation-gauss" class="hidden">
-                @input("mutation-mean", "mean", d.MutationMean)
-                @input("mutation-std", "std", d.MutationStd)
-            </div>
+			if d.MutationType == "uniform" {
+				<div id="mutation-uniform">
+					@input("mutation-min", "min", d.MutationMin)
+					@input("mutation-max", "max", d.MutationMax)
+				</div>
+			} else {
+				<div id="mutation-uniform" class="hidden">
+					@input("mutation-min", "min", d.MutationMin)
+					@input("mutation-max", "max", d.MutationMax)
+				</div>
+			}
+			
+			if d.MutationType == "gauss" {
+				<div id="mutation-gauss">
+					@input("mutation-mean", "mean", d.MutationMean)
+					@input("mutation-std", "std", d.MutationStd)
+				</div>
+			} else {
+				<div id="mutation-gauss" class="hidden">
+					@input("mutation-mean", "mean", d.MutationMean)
+					@input("mutation-std", "std", d.MutationStd)
+				</div>
+			}
  		</div>
 
 
@@ -60,9 +108,45 @@ templ StrategiesBlock(d StrategyBlockData) {
         <div>
             <label data-i18n="crossover">Crossover</label>
             <select id="crossover-type" class="w-full bg-neutral-700 p-2 rounded">
-                <option value="arithmetic" data-i18n-option="arithmetic">Arithmetic</option>
-            </select>
-        </div>
+				if d.CrossoverType == "arithmetic" {
+					<option value="arithmetic" selected data-i18n-option="arithmetic">Arithmetic</option>
+				} else {
+					<option value="arithmetic" data-i18n-option="arithmetic">Arithmetic</option>
+				}
+				
+				if d.CrossoverType == "sbx" {
+					<option value="sbx" selected data-i18n-option="sbx">SBX</option>
+				} else {
+					<option value="sbx" data-i18n-option="sbx">SBX</option>
+				}
+				
+				if d.CrossoverType == "blx" {
+					<option value="blx" selected data-i18n-option="blx">BLX</option>
+				} else {
+					<option value="blx" data-i18n-option="blx">BLX</option>
+				}
+			</select>
+		
+			if d.CrossoverType == "sbx" {
+				<div id="crossover-sbx">
+					@input("crossover-eta", "eta", d.CrossoverEta)
+				</div>
+			} else {
+				<div id="crossover-sbx" class="hidden">
+					@input("crossover-eta", "eta", d.CrossoverEta)
+				</div>
+			}
+			
+			if d.CrossoverType == "blx" {
+				<div id="crossover-blx">
+					@input("crossover-gamma", "gamma", d.CrossoverGamma)
+				</div>
+			} else {
+				<div id="crossover-blx" class="hidden">
+					@input("crossover-gamma", "gamma", d.CrossoverGamma)
+				</div>
+			}
+		</div>
 
 
  		<!-- LOCAL OPT -->

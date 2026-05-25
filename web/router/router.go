@@ -57,26 +57,28 @@ var (
 		// defaults
 		DefaultAlpha:        1,
 		DefaultBeta:         1,
-		PheromoneMultiplier: 2500,
-		EvaporationRate:     0.01,
-		InitialPheromone:    2500,
+		PheromoneMultiplier: 1,
+		EvaporationRate:     0.5,
+		InitialPheromone:    1,
 
-		GenerationCount:  100,
-		ColonySize:       10,
-		GenerationPeriod: 10,
-		ParentCount:      10,
+		GenerationCount:  300,
+		ColonySize:       100,
+		GenerationPeriod: 5,
+		ParentCount:      25,
 
 		// стратегии (простые дефолты)
-		SelectionType: "best",
+		SelectionType: "roulette",
 		TournamentK:   3,
 
-		CrossoverType: "arithmetic",
+		CrossoverType:  "blx",
+		CrossoverEta:   1.0,
+		CrossoverGamma: 0.5,
 
-		MutationType: "uniform",
-		MutationMin:  -0.2,
-		MutationMax:  0.2,
+		MutationType: "gauss",
+		MutationMin:  -0.1,
+		MutationMax:  0.1,
 		MutationMean: 0,
-		MutationStd:  0.3,
+		MutationStd:  0.05,
 
 		LocalOptimisation: "noop",
 	}

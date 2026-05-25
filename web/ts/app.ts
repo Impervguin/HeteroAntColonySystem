@@ -64,6 +64,8 @@ const elements = {
   
   // Crossover
   crossoverType: document.getElementById("crossover-type") as HTMLSelectElement,
+  crossoverEta: document.getElementById("crossover-eta") as HTMLInputElement,
+  crossoverGamma: document.getElementById("crossover-gamma") as HTMLInputElement,
 
   // Local optimisation
   localOptimisation: document.getElementById("local-optimisation") as HTMLSelectElement,
@@ -100,12 +102,18 @@ function getFormInput(): HacoFormInput | null {
       generation_period: parseInt(elements.generationPeriod.value, 10),
       parent_count: parseInt(elements.parentCount.value, 10),
 
-      selection_type: selectionType as "best" | "tournament",
+      selection_type: selectionType as "best" | "tournament" | "roulette",
       tournament_k: selectionType === "tournament"
         ? parseInt(elements.tournamentK.value, 10)
         : undefined,
 
-      crossover_type: elements.crossoverType.value as "arithmetic",
+      crossover_type: elements.crossoverType.value as "arithmetic" | "sbx" | "blx",
+      crossover_eta: elements.crossoverType.value === "sbx"
+        ? parseFloat(elements.crossoverEta.value)
+        : undefined,
+      crossover_gamma: elements.crossoverType.value === "blx"
+        ? parseFloat(elements.crossoverGamma.value)
+        : undefined,
 
       mutation_type: mutationType as "uniform" | "gauss",
       mutation_min: mutationType === "uniform"
@@ -371,6 +379,8 @@ async function init() {
   if (languageSelect) {
     languageSelect.value = getCurrentLanguage()
   }
+
+  updateUI()
 
   // Clear initial plots
   const plotIds = ["graph", "pheromone-graph", "heatmap", "coeffs", "score"]

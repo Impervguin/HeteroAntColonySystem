@@ -56,7 +56,7 @@ func DeserializeHacoRunRequest(c *gin.Context) (*HacoRunRequest, error) {
 }
 
 type HacoSelectionStrategy struct {
-	T string `json:"type" binding:"required,oneof=best tournament"`
+	T string `json:"type" binding:"required,oneof=best tournament roulette"`
 
 	// Tournament
 	K *uint `json:"k"`
@@ -70,6 +70,8 @@ func (s *HacoSelectionStrategy) Verify() error {
 		if s.K == nil {
 			return errors.New("tournament selection strategy requires k")
 		}
+	case "roulette":
+		return nil
 	default:
 		return errors.New("unknown selection strategy")
 	}
@@ -82,22 +84,39 @@ func (s *HacoSelectionStrategy) Get() colony.ParentSelectionStrategy {
 		return selection.NewBestSelectionStrategy()
 	case "tournament":
 		return selection.NewTournamentSelectionStrategy(*s.K)
+	case "roulette":
+		return selection.NewRouletteSelectionStrategy()
 	default:
 		panic("unknown selection strategy")
 	}
 }
 
 type HacoCrossoverStrategy struct {
-	T string `json:"type" binding:"required,oneof=arithmetic"`
+	T string `json:"type" binding:"required,oneof=arithmetic sbx blx"`
+
+	// SBX
+	Eta *float64 `json:"eta"`
+
+	// BLX
+	Gamma *float64 `json:"gamma"`
 }
 
 func (s *HacoCrossoverStrategy) Verify() error {
 	switch s.T {
 	case "arithmetic":
 		return nil
+	case "sbx":
+		if s.Eta == nil {
+			return errors.New("sbx crossover strategy requires eta")
+		}
+	case "blx":
+		if s.Gamma == nil {
+			return errors.New("blx crossover strategy requires gamma")
+		}
 	default:
 		return errors.New("unknown crossover strategy")
 	}
+	return nil
 }
 
 // Get returns the crossover strategy
@@ -105,6 +124,10 @@ func (s *HacoCrossoverStrategy) Get() colony.CrossoverStrategy {
 	switch s.T {
 	case "arithmetic":
 		return crossover.NewAriphmeticCrossoverStrategy()
+	case "sbx":
+		return crossover.NewSBXCrossoverStrategy(*s.Eta)
+	case "blx":
+		return crossover.NewBLXCrossoverStrategy(*s.Gamma)
 	default:
 		panic("unknown crossover strategy")
 	}

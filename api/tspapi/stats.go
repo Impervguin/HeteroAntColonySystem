@@ -2,6 +2,7 @@ package tspapi
 
 import (
 	"HeteroAntColonySystem/api/tspapi/dto"
+	"HeteroAntColonySystem/pkg/algo/greedy"
 	"HeteroAntColonySystem/pkg/graph"
 	"math"
 )
@@ -35,8 +36,13 @@ func CalculateGraphStats(g *graph.Graph) *dto.GraphStatsResponse {
 	expectedPathLength := avgEdgeWeight * float64(g.Len())
 	possibleSolutions := factorial(g.Len()-1) / 2
 
-	recommendedPheromoneMultiplier := avgEdgeWeight * (math.Sqrt(float64(g.Len())) * 2)
-	recommendedEvaporationRate := math.Min(0.3, math.Max(0.05, float64(g.Len())/10.))
+	recommendedPheromoneMultiplier := 1.0
+	recommendedEvaporationRate := 0.5
+	greed := greedy.NewGreedyAlgorithm(g)
+	greed.Run()
+
+	colonySize := uint(g.Len())
+	recommendedInitialPheromone := float64(colonySize) / greed.Score()
 	return &dto.GraphStatsResponse{
 		NodesCount:                     uint(g.Len()),
 		EdgesCount:                     uint64(g.EdgeLen()),
@@ -47,5 +53,6 @@ func CalculateGraphStats(g *graph.Graph) *dto.GraphStatsResponse {
 		ExpectedPathLength:             expectedPathLength,
 		RecommendedPheromoneMultiplier: recommendedPheromoneMultiplier,
 		RecommendedEvaporationRate:     recommendedEvaporationRate,
+		RecommendedInitialPheromone:    recommendedInitialPheromone,
 	}
 }

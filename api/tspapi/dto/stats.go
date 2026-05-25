@@ -20,6 +20,7 @@ type GraphStatsResponse struct {
 	ExpectedPathLength             float64 `json:"expected_path_length"`
 	RecommendedPheromoneMultiplier float64 `json:"recommended_pheromone_multiplier"`
 	RecommendedEvaporationRate     float64 `json:"recommended_evaporation_rate"`
+	RecommendedInitialPheromone    float64 `json:"recommended_initial_pheromone"`
 }
 
 func DeserializeGetGraphStatsRequest(c *gin.Context) (*graph.Graph, error) {

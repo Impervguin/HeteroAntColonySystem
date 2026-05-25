@@ -21,19 +21,21 @@ type PageData struct {
 	GenerationPeriod uint
 	ParentCount      uint
 
-	// стратегии (простые дефолты)
-	SelectionType string
-	TournamentK  uint
+ 	// стратегии (простые дефолты)
+ 	SelectionType string
+ 	TournamentK  uint
 
-	CrossoverType string
+ 	CrossoverType  string
+ 	CrossoverEta   float64
+ 	CrossoverGamma float64
 
-	MutationType string
-	MutationMin  float64
-	MutationMax  float64
-	MutationMean float64
-	MutationStd  float64
+ 	MutationType string
+ 	MutationMin  float64
+ 	MutationMax  float64
+ 	MutationMean float64
+ 	MutationStd  float64
 
-	LocalOptimisation string
+ 	LocalOptimisation string
 
 	Files []string
 }
@@ -53,17 +55,20 @@ func (d PageData) ParamsBlockData() components.ParamsBlockData {
 }
 
 func (d PageData) StrategiesBlockData() components.StrategyBlockData {
-	return components.StrategyBlockData{
-		SelectionType: d.SelectionType,
-		TournamentK: d.TournamentK,
-		MutationType: d.MutationType,
-		MutationMin: d.MutationMin,
-		MutationMax: d.MutationMax,
-		MutationMean: d.MutationMean,
-		MutationStd: d.MutationStd,
-		LocalOptimisation: d.LocalOptimisation,
-	}
-}
+ 	return components.StrategyBlockData{
+ 		SelectionType: d.SelectionType,
+ 		TournamentK: d.TournamentK,
+ 		CrossoverType: d.CrossoverType,
+ 		CrossoverEta:  d.CrossoverEta,
+ 		CrossoverGamma: d.CrossoverGamma,
+ 		MutationType: d.MutationType,
+ 		MutationMin: d.MutationMin,
+ 		MutationMax: d.MutationMax,
+ 		MutationMean: d.MutationMean,
+ 		MutationStd: d.MutationStd,
+ 		LocalOptimisation: d.LocalOptimisation,
+ 	}
+ }
 
 templ Page(d PageData) {
 <!DOCTYPE html>
