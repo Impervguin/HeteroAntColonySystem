@@ -23,6 +23,9 @@ func (s *BestSelectionStrategy) SelectParents(ants []ant.AntView, n uint) []ant.
 	slices.SortFunc(tmp, func(a, b ant.AntView) int {
 		return int(a.SumScore() - b.SumScore())
 	})
+	if len(tmp) < int(n) {
+		return tmp
+	}
 
 	return tmp[:n]
 }

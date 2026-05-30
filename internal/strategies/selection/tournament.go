@@ -20,6 +20,9 @@ func NewTournamentSelectionStrategy(k uint) *TournamentSelectionStrategy {
 
 func (s *TournamentSelectionStrategy) SelectParents(ants []ant.AntView, n uint) []ant.AntView {
 	res := make([]ant.AntView, 0, n)
+	if len(ants) == 0 {
+		return ants
+	}
 
 	samples := make([]ant.AntView, s.k)
 	for i := 0; uint(i) < n; i++ {
