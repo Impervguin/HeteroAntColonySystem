@@ -13,12 +13,17 @@ templ input(name string, labelKey string, value any) {
  	</div>
 }
 
-templ stat(nameKey string, value string, commentKey string, col int) {
- 	<div class={ fmt.Sprintf("bg-neutral-700 rounded-lg p-3 col-span-%d", col) }>
- 		<div class="text-neutral-400 text-sm" { fmt.Sprintf("data-i18n=%s", nameKey) }>{ nameKey }</div>
- 		<div class="text-2xl font-bold text-amber-300">{ value }</div>
- 		if commentKey != "" {
- 			<div class="text-neutral-500 text-xs mt-1" { fmt.Sprintf("data-i18n=%s", commentKey) }>{ commentKey }</div>
- 		}
- 	</div>
+templ stat(nameKey string, value string, unitKey string, commentKey string, col int) {
+  	<div class={ fmt.Sprintf("bg-neutral-700 rounded-lg p-3 col-span-%d", col) }>
+  		<div class="text-neutral-400 text-sm" { fmt.Sprintf("data-i18n=%s", nameKey) }>{ nameKey }</div>
+  		<div class="text-2xl font-bold text-amber-300">
+  			{ value }
+  			if unitKey != "" {
+  				<span class="text-sm font-normal text-neutral-400 ml-1" { fmt.Sprintf("data-i18n=%s", unitKey) }>{ unitKey }</span>
+  			}
+  		</div>
+  		if commentKey != "" {
+  			<div class="text-neutral-500 text-xs mt-1" { fmt.Sprintf("data-i18n=%s", commentKey) }>{ commentKey }</div>
+  		}
+  	</div>
 }

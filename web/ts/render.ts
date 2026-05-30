@@ -257,6 +257,251 @@ export function renderGraph(
   Plotly.newPlot(plotDiv, traces, layout, config)
 }
 
+// export function renderGraph(
+//   graph: Graph,
+//   bestPath?: string[]
+// ) {
+//   const nodes = graph.nodes
+//   const edges = graph.edges
+
+//   const xs: number[] = []
+//   const ys: number[] = []
+//   const nodeNames: string[] = []
+
+//   nodes.forEach(n => {
+//     const [x, y] = getCoords(n)
+//     xs.push(x)
+//     ys.push(y)
+//     nodeNames.push(n.name || n.id)
+//   })
+
+//   const traces: any[] = []
+
+//   // Draw all edges with high transparency (not in path)
+//   if (edges && edges.length > 0) {
+//     const edgeXs: number[] = []
+//     const edgeYs: number[] = []
+    
+//     edges.forEach(edge => {
+//       const sourceNode = nodes.find(n => n.id === edge.source)
+//       const targetNode = nodes.find(n => n.id === edge.target)
+      
+//       if (sourceNode && targetNode) {
+//         const [x1, y1] = getCoords(sourceNode)
+//         const [x2, y2] = getCoords(targetNode)
+        
+//         edgeXs.push(x1, x2, null as any)
+//         edgeYs.push(y1, y2, null as any)
+//       }
+//     })
+    
+//     traces.push({
+//       x: edgeXs,
+//       y: edgeYs,
+//       mode: "lines",
+//       type: "scatter",
+//       name: t("otherEdges"),
+//       line: {
+//         color: "rgba(180, 180, 180, 0.6)", // Светло-серые ребра
+//         width: 1.5,
+//         dash: "solid"
+//       },
+//       hoverinfo: "none",
+//       showlegend: false
+//     })
+//   }
+
+//   // Draw best path edges (highlighted and cycled)
+//   if (bestPath && bestPath.length > 0) {
+//     const pathEdgeXs: number[] = []
+//     const pathEdgeYs: number[] = []
+    
+//     // Draw edges between consecutive nodes in bestPath
+//     for (let i = 0; i < bestPath.length - 1; i++) {
+//       const sourceNode = nodes.find(n => n.id === bestPath[i])
+//       const targetNode = nodes.find(n => n.id === bestPath[i + 1])
+      
+//       if (sourceNode && targetNode) {
+//         const [x1, y1] = getCoords(sourceNode)
+//         const [x2, y2] = getCoords(targetNode)
+        
+//         pathEdgeXs.push(x1, x2, null as any)
+//         pathEdgeYs.push(y1, y2, null as any)
+//       }
+//     }
+    
+//     // Close the cycle: connect last node to first node
+//     if (bestPath.length > 1) {
+//       const lastNode = nodes.find(n => n.id === bestPath[bestPath.length - 1])
+//       const firstNode = nodes.find(n => n.id === bestPath[0])
+      
+//       if (lastNode && firstNode) {
+//         const [x1, y1] = getCoords(lastNode)
+//         const [x2, y2] = getCoords(firstNode)
+//         pathEdgeXs.push(x1, x2, null as any)
+//         pathEdgeYs.push(y1, y2, null as any)
+//       }
+//     }
+    
+//     traces.push({
+//       x: pathEdgeXs,
+//       y: pathEdgeYs,
+//       mode: "lines",
+//       type: "scatter",
+//       name: t("bestPathTSP"),
+//       line: {
+//         color: "#10b981", // Изумрудный цвет
+//         width: 3.5,
+//         dash: "solid"
+//       },
+//       hoverinfo: "none",
+//       showlegend: false
+//     })
+//   }
+
+//   // Draw all nodes (all are in path for TSP)
+//   traces.push({
+//     x: xs,
+//     y: ys,
+//     mode: "markers+text",
+//     type: "scatter",
+//     name: t("cities"),
+//     text: nodeNames,
+//     textposition: "top center",
+//     textfont: {
+//       size: 11,
+//       color: "#374151", // Темно-серый для текста
+//       family: "Arial, sans-serif",
+//       weight: "bold" as "bold"
+//     },
+//     marker: {
+//       size: 14,
+//       color: "#3b82f6", // Ярко-синий для узлов
+//       symbol: "circle",
+//       line: {
+//         color: "#ffffff", // Белая обводка
+//         width: 2.5
+//       }
+//     },
+//     hoverinfo: "text",
+//     hovertext: nodeNames.map((name, idx) =>
+//       `<b style="color:#10b981">${name}</b><br>ID: ${nodes[idx].id}<br>Coordinates: (${xs[idx].toFixed(2)}, ${ys[idx].toFixed(2)})`
+//     ),
+//     showlegend: false
+//   })
+
+//   // Calculate layout with light theme colors
+//   const xRange = Math.max(...xs) - Math.min(...xs)
+//   const yRange = Math.max(...ys) - Math.min(...ys)
+//   const padding = Math.max(xRange, yRange) * 0.1
+
+//   const layout = {
+//     title: {
+//       text: "",
+//       font: {
+//         size: 18,
+//         family: "Arial, sans-serif",
+//         weight: "bold" as "bold",
+//         color: "#1f2937"
+//       },
+//       x: 0.5,
+//       xanchor: "center" as "center"
+//     },
+//     xaxis: {
+//       title: {
+//         text: t("xCoordinate"),
+//         font: { 
+//           color: "#6b7280", 
+//           size: 13,
+//           weight: "bold" as "bold"
+//         }
+//       },
+//       showgrid: true,
+//       gridcolor: "#f0f0f0", // Очень светлая сетка
+//       gridwidth: 1,
+//       showline: true,
+//       linecolor: "#d1d5db",
+//       linewidth: 1.5,
+//       mirror: true,
+//       zeroline: false,
+//       tickfont: { 
+//         color: "#9ca3af",
+//         size: 11
+//       },
+//       range: [Math.min(...xs) - padding, Math.max(...xs) + padding]
+//     },
+//     yaxis: {
+//       title: {
+//         text: t("yCoordinate"),
+//         font: { 
+//           color: "#6b7280",
+//           size: 13,
+//           weight: "bold" as "bold"
+//         }
+//       },
+//       showgrid: true,
+//       gridcolor: "#f0f0f0", // Очень светлая сетка
+//       gridwidth: 1,
+//       showline: true,
+//       linecolor: "#d1d5db",
+//       linewidth: 1.5,
+//       mirror: true,
+//       zeroline: false,
+//       tickfont: { 
+//         color: "#9ca3af",
+//         size: 11
+//       },
+//       range: [Math.min(...ys) - padding, Math.max(...ys) + padding],
+//       scaleanchor: "x" as "x",
+//       scaleratio: 1
+//     },
+//     hovermode: "closest" as "closest",
+//     plot_bgcolor: "#ffffff",
+//     paper_bgcolor: "#fafafa",
+//     margin: { 
+//       t: 60,
+//       r: 80,
+//       b: 60,
+//       l: 60
+//     },
+//     // legend: {
+//     //   x: 1.02,
+//     //   y: 1,
+//     //   xanchor: "left" as "left",
+//     //   bgcolor: "rgba(255, 255, 255, 0.95)",
+//     //   bordercolor: "#e5e7eb",
+//     //   borderwidth: 1.5,
+//     //   font: { 
+//     //     color: "#6b7280",
+//     //     size: 12,
+//     //     weight: "bold" as "bold"
+//     //   },
+//     //   itemsizing: "constant" as "constant"
+//     // },
+//     font: {
+//       family: "Arial, sans-serif",
+//       size: 12,
+//       color: "#6b7280"
+//     }
+//   }
+
+//   const config = {
+//     responsive: true,
+//     displayModeBar: true,
+//     modeBarButtonsToRemove: ["lasso2d", "select2d"] as any,
+//     displaylogo: false,
+//     toImageButtonOptions: {
+//       format: "png" as "png",
+//       filename: "tsp_graph_visualization",
+//       width: 1200,
+//       height: 800,
+//     }
+//   }
+
+//   const plotDiv = document.getElementById("graph")!
+//   Plotly.newPlot(plotDiv, traces, layout, config)
+// }
+
 // =======================
 // 2. PHEROMONE GRAPH
 // =======================

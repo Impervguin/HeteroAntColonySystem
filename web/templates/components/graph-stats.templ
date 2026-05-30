@@ -37,16 +37,16 @@ templ GraphStats(data *dto.GraphStatsRequest) {
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <!-- Basic Info -->
 
-                @stat("nodes", fmt.Sprintf("%d", data.NodesCount), "vertices", 1)
-                @stat("edges", fmt.Sprintf("%d", data.EdgesCount), "connections", 1)
-                @stat("possibleSolutions", formatPossibleSolutions(data.PossibleSolutions), "", 1)
-                @stat("avgEdgeWeight", fmt.Sprintf("%.2f", data.AvgEdgeWeight), "units", 1)
-                @stat("minEdgeWeight", fmt.Sprintf("%.2f", data.MinEdgeWeight), "", 1)
-                @stat("maxEdgeWeight", fmt.Sprintf("%.2f", data.MaxEdgeWeight), "", 1)
-                @stat("expectedPathLength", fmt.Sprintf("%.2f", data.ExpectedPathLength), "avgWeightNodes", 2)
-                @stat("recommendedQ", fmt.Sprintf("%.2f", data.RecommendedPheromoneMultiplier), "pheromoneMultiplier", 1)
-                @stat("recommendedRho", fmt.Sprintf("%.3f", data.RecommendedEvaporationRate), "evaporationRate", 1)
-				@stat("recommendedInitialPheromone", fmt.Sprintf("%.2f", data.RecommendedInitialPheromone), "rinitialPheromone", 2)
+                @stat("nodes", fmt.Sprintf("%d", data.NodesCount), "", "vertices", 1)
+                @stat("edges", fmt.Sprintf("%d", data.EdgesCount), "", "connections", 1)
+                @stat("possibleSolutions", formatPossibleSolutions(data.PossibleSolutions), "", "", 1)
+                @stat("avgEdgeWeight", fmt.Sprintf("%.2f", data.AvgEdgeWeight), "", "units", 1)
+                @stat("minEdgeWeight", fmt.Sprintf("%.2f", data.MinEdgeWeight), "", "", 1)
+                @stat("maxEdgeWeight", fmt.Sprintf("%.2f", data.MaxEdgeWeight), "", "", 1)
+                @stat("expectedPathLength", fmt.Sprintf("%.2f", data.ExpectedPathLength), "", "avgWeightNodes", 2)
+                @stat("recommendedQ", fmt.Sprintf("%.2f", data.RecommendedPheromoneMultiplier), "", "pheromoneMultiplier", 1)
+                @stat("recommendedRho", fmt.Sprintf("%.3f", data.RecommendedEvaporationRate), "", "evaporationRate", 1)
+ 				@stat("recommendedInitialPheromone", fmt.Sprintf("%.2f", data.RecommendedInitialPheromone), "", "rinitialPheromone", 2)
 
             </div>
         }

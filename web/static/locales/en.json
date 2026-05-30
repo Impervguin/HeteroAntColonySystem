@@ -11,6 +11,7 @@
   "hacoCompleted": "HACO completed! Best score: {score}",
   "hacoFailed": "HACO execution failed",
   "failedToLoadGraphStats": "Failed to load graph statistics",
+  "failedToLoadRuntimeStats": "Failed to load runtime statistics",
   "otherEdges": "other edges",
   "bestPathTSP": "best path (TSP cycle)",
   "cities": "cities",
@@ -39,6 +40,7 @@
   "hacoVisualizer": "HACO Visualizer",
   "acoPlayground": "Ant Colony Optimization playground",
   "hacoVisualizerTitle": "🐜 HACO Visualizer",
+  "language": "Language",
   "runHacoBtn": "Run HACO",
   "graphPanel": "Graph",
   "pheromonesPanel": "Pheromones (edges)",
@@ -105,8 +107,9 @@
   "pathSeen": "Paths Seen",
   "pathSeenComment": "count of paths algorithm tried",
   "totalTime": "Total Time",
+  "totalTimeComment": "all generations",
   "minTime": "Min Time",
-  "mineTimeComment": "of one generation",
+  "minTimeComment": "of one generation",
   "avgTime": "Avg Time",
   "avgTimeComment": "of one generation",
   "maxTime": "Max Time",
@@ -116,5 +119,13 @@
   "avgMemory": "Avg Memory",
   "avgMemoryComment": "heap, stack, runtime",
   "maxMemory": "Max Memory",
-  "maxMemoryComment": "heap, stack, runtime"
+  "maxMemoryComment": "heap, stack, runtime",
+
+  "timeUnitMs": "ms",
+  "timeUnitSec": "sec",
+  "timeUnitMin": "min",
+  "memoryUnitB": "B",
+  "memoryUnitKB": "KB",
+  "memoryUnitMB": "MB",
+  "memoryUnitGB": "GB"
 }
