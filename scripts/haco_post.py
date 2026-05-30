@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
 os.makedirs("out/haco", exist_ok=True)
 
@@ -133,68 +134,175 @@ with open("out/variations.tex", "w", encoding="utf-8") as f:
 
 print("LaTeX таблицы для каждого файла сохранены в 'out/variations.tex'")
 
-plt.rcParams.update({'font.size': 12, 'axes.labelsize': 14, 'axes.titlesize': 16, 
-                     'xtick.labelsize': 10, 'ytick.labelsize': 10})
+# Нормальные размеры шрифтов для всех графиков
+plt.rcParams.update({
+    'font.size': 114,           # базовый размер шрифта
+    'axes.labelsize': 116,      # размер подписей осей
+    'axes.titlesize': 118,      # размер заголовка
+    'xtick.labelsize': 112,     # размер подписей меток X
+    'ytick.labelsize': 112,     # размер подписей меток Y
+    'legend.fontsize': 112,     # размер шрифта легенды
+    'figure.titlesize': 120     # размер заголовка фигуры
+})
 
-fig_rank, ax_rank = plt.subplots(figsize=(14, 8))
+# График рангов с выделением лучшей конфигурации (золотой столбец + красный шрифт)
+fig_rank, ax_rank = plt.subplots(figsize=(16, 10))
 
-colors = plt.cm.Set3(np.linspace(0, 1, len(algorithm_stats)))
+# Находим лучшую конфигурацию (с минимальным средним рангом)
+best_idx = algorithm_stats['Средний ранг'].idxmin()
+best_config = algorithm_stats.iloc[best_idx]
+best_rank_value = best_config['Средний ранг']
+
+# Создаем цвета: для лучшей - золотой, для остальных - из палитры
+colors_list = []
+for i in range(len(algorithm_stats)):
+    if i == best_idx:
+        colors_list.append('gold')
+    else:
+        colors_list.append(plt.cm.Set3(i / len(algorithm_stats)))
 
 bars = ax_rank.bar(range(len(algorithm_stats)), algorithm_stats['Средний ранг'], 
-                   color=colors, edgecolor='black', linewidth=1.5)
+                   color=colors_list, edgecolor='black', linewidth=1.5, zorder=2)
 
+# Добавляем значения над столбцами
 for i, (bar, val) in enumerate(zip(bars, algorithm_stats['Средний ранг'])):
+    if i == best_idx:
+        # Для лучшей конфигурации - красный жирный шрифт
+        color = 'red'
+        fontweight = 'bold'
+        fontsize = 14
+    else:
+        color = 'black'
+        fontweight = 'normal'
+        fontsize = 13
     ax_rank.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, 
-                 f'{val:.2f}', ha='center', va='bottom', fontsize=10, fontweight='bold')
+                 f'{val:.2f}', ha='center', va='bottom', fontsize=fontsize, 
+                 fontweight=fontweight, color=color)
 
-ax_rank.set_xlabel('Конфигурация', fontsize=14, fontweight='bold')
-ax_rank.set_ylabel('Средний ранг', fontsize=14, fontweight='bold')
-ax_rank.set_title('Средний ранг конфигураций', fontsize=16, fontweight='bold', pad=20)
+# Добавляем стрелку к лучшему столбцу
+best_bar = bars[best_idx]
+arrow_y = best_bar.get_height() + 15
+arrow = FancyArrowPatch((best_bar.get_x() + best_bar.get_width()/2, arrow_y),
+                        (best_bar.get_x() + best_bar.get_width()/2, best_bar.get_height() + 0.2),
+                        arrowstyle='->', mutation_scale=30, linewidth=2.5,
+                        color='red', zorder=3)
+ax_rank.add_patch(arrow)
+
+# Добавляем текст со стрелкой
+ax_rank.annotate('Лучшая конфигурация',
+                xy=(best_bar.get_x() + best_bar.get_width()/2, best_bar.get_height() + 15.6),
+                xytext=(best_bar.get_x() + best_bar.get_width()/2 + 1.5, best_bar.get_height() + 15.6),
+                # arrowprops=dict(arrowstyle='->', color='red', lw=2, 
+                #                connectionstyle='arc3,rad=0.3'),
+                fontsize=12, fontweight='bold', color='red',
+                ha='center', va='bottom',
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='lightyellow', 
+                         edgecolor='red', alpha=0.9))
+
+# Добавляем рамку вокруг лучшего столбца
+rect = FancyBboxPatch((best_bar.get_x() - 0.03, best_bar.get_y() - 0.03),
+                       best_bar.get_width() + 0.06, best_bar.get_height() + 0.06,
+                       boxstyle='round,pad=0.02', linewidth=2.5, 
+                       edgecolor='red', facecolor='none', zorder=4)
+ax_rank.add_patch(rect)
+
+# Делаем подпись оси X для лучшей конфигурации красной
+xticklabels = [f'{label.get_text()}' for label in ax_rank.get_xticklabels()]
+ax_rank.set_xlabel('Конфигурация', fontsize=16, fontweight='bold')
+ax_rank.set_ylabel('Средний ранг', fontsize=16, fontweight='bold')
+ax_rank.set_title('Средний ранг конфигураций', 
+                  fontsize=18, fontweight='bold', pad=20)
 ax_rank.set_xticks(range(len(algorithm_stats)))
-ax_rank.set_xticklabels(algorithm_stats['Алгоритм'], rotation=45, ha='right')
-ax_rank.grid(True, axis='y', linestyle='--', alpha=0.6, linewidth=0.8)
+ax_rank.set_xticklabels(algorithm_stats['Алгоритм'], rotation=45, ha='right', fontsize=11)
+
+# Делаем красной метку лучшей конфигурации на оси X
+labels = ax_rank.get_xticklabels()
+labels[best_idx].set_color('red')
+labels[best_idx].set_fontweight('bold')
+labels[best_idx].set_fontsize(12)
+
+ax_rank.grid(True, axis='y', linestyle='--', alpha=0.6, linewidth=0.8, zorder=1)
 ax_rank.set_axisbelow(True)
+ax_rank.tick_params(axis='both', which='major', labelsize=12)
+
+# Устанавливаем отступ сверху для размещения аннотации
+ax_rank.set_ylim(0, ax_rank.get_ylim()[1] * 1.15)
 
 plt.tight_layout()
 plt.savefig('out/haco/rank.png', dpi=200, bbox_inches='tight', facecolor='white')
 plt.show()
 
+# Тепловая карта с выделением лучшей конфигурации (красный шрифт)
 rank_pivot = agg.pivot_table(index='name_ru', columns='file_clean', values='rank', aggfunc='first')
 order = algorithm_stats.sort_values('Средний ранг')['Алгоритм'].tolist()
 rank_pivot = rank_pivot.reindex(order)
 
-fig_heatmap, ax_heatmap = plt.subplots(figsize=(12, 10))
+fig_heatmap, ax_heatmap = plt.subplots(figsize=(14, 12))
 
+# Создаем маску для выделения строки лучшей конфигурации
+best_algorithm_name = best_config['Алгоритм']
+best_row_idx = rank_pivot.index.get_loc(best_algorithm_name)
+
+# Создаем пользовательскую цветовую карту
 cmap = LinearSegmentedColormap.from_list('RdYlGn', ['green', 'yellow', 'red'], N=100)
 
 im = ax_heatmap.imshow(rank_pivot.values, cmap=cmap, aspect='auto', 
                         interpolation='nearest', vmin=1, vmax=rank_pivot.values.max())
 
+# Добавляем значения в ячейки
 for i in range(rank_pivot.shape[0]):
     for j in range(rank_pivot.shape[1]):
         value = rank_pivot.values[i, j]
         if not pd.isna(value):
-            norm_val = (value - 1) / (rank_pivot.values.max() - 1)
-            text_color = 'white' if norm_val > 0.5 else 'black'
+            norm_val = (value - 1) / (rank_pivot.values.max() - 1) if rank_pivot.values.max() > 1 else 0.5
+            text_color = 'black'
+            # Для лучшей конфигурации - красный жирный шрифт независимо от фона
+            if i == best_row_idx:
+                fontweight = 'bold'
+                fontsize = 13
+            else:
+                fontweight = 'normal'
+                fontsize = 12
             ax_heatmap.text(j, i, f'{value:.0f}', ha='center', va='center', 
-                          fontsize=10, fontweight='bold', color=text_color)
+                          fontsize=fontsize, fontweight=fontweight, color=text_color)
+
+# Выделяем строку лучшей конфигурации красной рамкой
+for j in range(rank_pivot.shape[1]):
+    rect = plt.Rectangle((j - 0.5, best_row_idx - 0.5), 1, 1, 
+                         fill=False, edgecolor='red', linewidth=3, 
+                         linestyle='-', zorder=5)
+    ax_heatmap.add_patch(rect)
+
+# Добавляем звездочку и подпись к лучшей конфигурации
+ax_heatmap.text(rank_pivot.shape[1] - 0.5, best_row_idx, ' ★', 
+                fontsize=20, color='red', fontweight='bold', 
+                ha='left', va='center', zorder=6)
+
+# Делаем название лучшей конфигурации на оси Y красным
+y_labels = [label.get_text() for label in ax_heatmap.get_yticklabels()]
+ax_heatmap.set_yticks(range(len(rank_pivot.index)))
+ax_heatmap.set_yticklabels(rank_pivot.index, fontsize=11)
+yticklabels = ax_heatmap.get_yticklabels()
+yticklabels[best_row_idx].set_color('red')
+yticklabels[best_row_idx].set_fontweight('bold')
+yticklabels[best_row_idx].set_fontsize(13)
 
 ax_heatmap.set_xticks(range(len(rank_pivot.columns)))
-ax_heatmap.set_xticklabels(rank_pivot.columns, rotation=45, ha='right')
-ax_heatmap.set_yticks(range(len(rank_pivot.index)))
-ax_heatmap.set_yticklabels(rank_pivot.index, fontsize=9)
-ax_heatmap.set_xlabel('Задача TSP', fontsize=14, fontweight='bold')
-ax_heatmap.set_ylabel('Конфигурация', fontsize=14, fontweight='bold')
+ax_heatmap.set_xticklabels(rank_pivot.columns, rotation=45, ha='right', fontsize=13)
+ax_heatmap.set_xlabel('Задача TSP', fontsize=16, fontweight='bold')
+ax_heatmap.set_ylabel('Конфигурация', fontsize=16, fontweight='bold')
 ax_heatmap.set_title('Тепловая карта рангов алгоритмов по задачам', 
                      fontsize=16, fontweight='bold', pad=20)
 
 cbar = plt.colorbar(im, ax=ax_heatmap)
-cbar.set_label('Ранг', fontsize=12, fontweight='bold')
+cbar.set_label('Ранг', fontsize=14, fontweight='bold')
+cbar.ax.tick_params(labelsize=11)
 
 plt.tight_layout()
 plt.savefig('out/haco/heatmap.png', dpi=200, bbox_inches='tight', facecolor='white')
 plt.show()
 
+print(f"\nЛучшая конфигурация: {best_config['Алгоритм']} со средним рангом {best_config['Средний ранг']:.2f}")
 print("\nГрафики сохранены:")
-print("  - out/rank_plot.png/pdf")
-print("  - out/rank_heatmap.png/pdf")
+print("  - out/haco/rank.png")
+print("  - out/haco/heatmap.png")

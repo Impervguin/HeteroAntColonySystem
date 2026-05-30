@@ -1,0 +1,18 @@
+\include{latex-parts/preambula}
+
+\begin{document}	
+	\includepdf[page=1]{titultz}
+	\includepdf[page=2]{titultz}
+	\setcounter{page}{3}
+	
+	%\def\contentsname{\begin{center} \vspace{-3.4cm} СОДЕРЖАНИЕ\end{center}}
+	\def\contentsname{\vspace{-2.9cm}\ssrnotoc{СОДЕРЖАНИЕ}}
+	
+	\tableofcontents
+
+	
+	
+	\include{latex-parts/intro}
+	\include{latex-parts/main-part}
+	\include{latex-parts/conclusion}
+\end{document}

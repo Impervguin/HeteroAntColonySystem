@@ -5,6 +5,18 @@ import numpy as np
 import os
 from adjustText import adjust_text
 
+# Устанавливаем глобальные настройки шрифтов для matplotlib
+plt.rcParams.update({
+    'font.size': 26,           # базовый размер шрифта
+    'axes.titlesize': 28,      # размер заголовка осей
+    'axes.labelsize': 26,      # размер подписей осей
+    'xtick.labelsize': 24,     # размер подписей ticks по X
+    'ytick.labelsize': 24,     # размер подписей ticks по Y
+    'legend.fontsize': 24,     # размер шрифта легенды
+    'figure.titlesize': 30,    # размер заголовка фигуры
+    'axes.titleweight': 'bold'
+})
+
 # Создаем папку для выходных файлов
 os.makedirs('out/convergence', exist_ok=True)
 
@@ -134,7 +146,7 @@ median_data = df.groupby(['file', 'name_ru']).agg({
 # ========== ГРАФИК 1: BOXPLOT ITB ==========
 print("\n--- Построение boxplot ITB ---")
 
-fig1, ax1 = plt.subplots(figsize=(16, 8))
+fig1, ax1 = plt.subplots(figsize=(16, 9))
 
 unique_files = sorted(df['file'].unique())
 
@@ -168,43 +180,43 @@ for file in unique_files:
 # Строим boxplot
 bp = ax1.boxplot(all_data, positions=positions, widths=0.6, patch_artist=True,
                 showmeans=True, meanline=True,
-                meanprops=dict(linestyle='--', linewidth=2, color='red', alpha=0.8),
-                medianprops=dict(linestyle='-', linewidth=2.5, color='black'),
-                whiskerprops=dict(color='black', linewidth=1.5),
-                capprops=dict(color='black', linewidth=1.5), showfliers=False)
+                meanprops=dict(linestyle='--', linewidth=2.5, color='red', alpha=0.8),
+                medianprops=dict(linestyle='-', linewidth=3, color='black'),
+                whiskerprops=dict(color='black', linewidth=2),
+                capprops=dict(color='black', linewidth=2), showfliers=False)
 
 # Применяем цвета и штриховки
 for box, color, hatch in zip(bp['boxes'], box_colors, box_hatches):
     box.set_facecolor(color)
     box.set_hatch(hatch)
     box.set_edgecolor('black')
-    box.set_linewidth(2)
+    box.set_linewidth(2.5)
     box.set_alpha(0.85)
 
 # Добавляем все точки
 for (file, algo), data in file_algo_data.items():
     jitter = np.random.normal(data['position'], 0.12, size=len(data['values']))
-    ax1.scatter(jitter, data['values'], alpha=0.4, s=25, c=data['color'], 
-               edgecolors='black', linewidth=0.5, zorder=3)
+    ax1.scatter(jitter, data['values'], alpha=0.4, s=35, c=data['color'], 
+               edgecolors='black', linewidth=1, zorder=3)
 
 # Настройка осей для boxplot
 ax1.set_xticks(list(file_centers.values()))
-ax1.set_xticklabels(list(file_centers.keys()), fontsize=12, fontweight='bold')
-ax1.set_xlabel('Задача', fontsize=14, fontweight='bold')
-ax1.set_ylabel('ITB (меньше — лучше)', fontsize=14, fontweight='bold')
-ax1.set_title('Распределение ITB по задачам и конфигурациям', fontsize=14, fontweight='bold')
-ax1.grid(True, axis='y', linestyle='--', alpha=0.6)
+ax1.set_xticklabels(list(file_centers.keys()), fontsize=14, fontweight='bold')
+ax1.set_xlabel('Задача', fontsize=18, fontweight='bold')
+ax1.set_ylabel('ITB (меньше — лучше)', fontsize=18, fontweight='bold')
+ax1.set_title('Распределение ITB по задачам и конфигурациям', fontsize=20, fontweight='bold', pad=20)
+ax1.grid(True, axis='y', linestyle='--', alpha=0.6, linewidth=1)
 ax1.set_ylim(bottom=0)
 
-# Легенда для boxplot
+# Легенда для boxplot (увеличенный размер)
 legend_elements = [mpatches.Patch(facecolor=colors[algo], edgecolor='black', 
                                    hatch=hatch_patterns[algo] * 2, label=algo, alpha=0.85) 
                    for algo in algorithms]
 legend_elements.extend([
-    plt.Line2D([0], [0], color='red', linestyle='--', linewidth=2, label='Среднее'),
-    plt.Line2D([0], [0], color='black', linestyle='-', linewidth=2.5, label='Медиана')
+    plt.Line2D([0], [0], color='red', linestyle='--', linewidth=2.5, label='Среднее'),
+    plt.Line2D([0], [0], color='black', linestyle='-', linewidth=3, label='Медиана')
 ])
-ax1.legend(handles=legend_elements, loc='upper right', fontsize=10)
+ax1.legend(handles=legend_elements, loc='upper right', fontsize=14, framealpha=0.95, edgecolor='black')
 
 plt.tight_layout()
 plt.savefig('out/convergence/itb_boxplots.png', dpi=200, bbox_inches='tight')
@@ -214,7 +226,7 @@ plt.close(fig1)
 # ========== ГРАФИК 2: ТОЧЕЧНЫЙ (МЕДИАНА ITB vs МЕДИАНА SCORE) ==========
 print("\n--- Построение точечного графика медиан ITB vs Score ---")
 
-fig2, ax2 = plt.subplots(figsize=(12, 9))
+fig2, ax2 = plt.subplots(figsize=(14, 10))
 
 texts = []
 
@@ -226,24 +238,24 @@ for algo in algorithms:
         algo_data['itb'], 
         algo_data['score'],
         alpha=0.7,
-        s=120,
+        s=180,
         c=colors[algo],
         marker=markers[algo],
         edgecolors='black',
-        linewidth=1.5,
+        linewidth=2,
         label=algo,
         zorder=3
     )
     
-    # Добавляем подписи
+    # Добавляем подписи с увеличенным шрифтом
     for _, row in algo_data.iterrows():
         text = ax2.annotate(
-            row['file'],
+            row['file'].replace('tsp/', '').replace('.tsp', ''),
             (row['itb'], row['score']),
-            fontsize=9,
-            alpha=0.8,
+            fontsize=11,
+            alpha=0.85,
             fontweight='bold',
-            bbox=dict(boxstyle="round,pad=0.2", facecolor="white", edgecolor="gray", alpha=0.7)
+            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="gray", alpha=0.8)
         )
         texts.append(text)
 
@@ -251,27 +263,31 @@ adjust_text(texts,
     ax=ax2,
     expand_points=(1.5, 1.5),
     expand_text=(1.2, 1.2),
-    arrowprops=dict(arrowstyle='->', color='gray', lw=0.5, alpha=0.5),
+    arrowprops=dict(arrowstyle='->', color='gray', lw=0.8, alpha=0.6),
     force_points=(0.2, 0.2),
     force_text=(0.2, 0.2),
     lim=500)
 
-# Настройка осей
-ax2.set_xlabel('ITB (медиана, меньше — лучше)', fontsize=14, fontweight='bold')
-ax2.set_ylabel('Длина маршрута (медиана, меньше — лучше)', fontsize=14, fontweight='bold')
-ax2.set_title('Зависимость медианы длины маршрута от медианы ITB по файлам', fontsize=14, fontweight='bold')
-ax2.grid(True, linestyle='--', alpha=0.6, linewidth=0.8)
+# Настройка осей с увеличенным шрифтом
+ax2.set_xlabel('ITB (медиана, меньше — лучше)', fontsize=18, fontweight='bold', labelpad=10)
+ax2.set_ylabel('Длина маршрута (медиана, меньше — лучше)', fontsize=18, fontweight='bold', labelpad=10)
+ax2.set_title('Зависимость медианы длины маршрута от медианы ITB по файлам', fontsize=20, fontweight='bold', pad=20)
+ax2.grid(True, linestyle='--', alpha=0.6, linewidth=1)
 ax2.set_xlim(left=0)
 ax2.set_ylim(bottom=0)
 
-# Легенда
-ax2.legend(loc='upper right', fontsize=12, framealpha=0.95, edgecolor='black')
+# Настройка ticks
+ax2.tick_params(axis='both', which='major', labelsize=14)
+ax2.tick_params(axis='both', which='minor', labelsize=12)
+
+# Легенда с увеличенным шрифтом
+ax2.legend(loc='upper right', fontsize=14, framealpha=0.95, edgecolor='black', markerscale=1.2)
 
 # Линии для "идеальной" точки
 min_itb = median_data['itb'].min()
 max_score = median_data['score'].max()
-ax2.axvline(x=min_itb, color='gray', linestyle=':', alpha=0.5, linewidth=1)
-ax2.axhline(y=max_score, color='gray', linestyle=':', alpha=0.5, linewidth=1)
+ax2.axvline(x=min_itb, color='gray', linestyle=':', alpha=0.5, linewidth=1.5)
+ax2.axhline(y=max_score, color='gray', linestyle=':', alpha=0.5, linewidth=1.5)
 
 plt.tight_layout()
 plt.savefig('out/convergence/itb_score_scatter.png', dpi=200, bbox_inches='tight')

@@ -4,12 +4,12 @@
 
 \section{Обоснования выбора программных средств реализации}
 
-\subsection*{Формат входных и выходных данные}
+\subsection*{Формат входных и выходных данных}
 
 Входными данными метода является взвешенный граф, описывающий конфигурацию задачи коммивояжёра. В качестве вводного формата для графа был выбран формат TSPLIB~\cite{tsplib}, так как:
 
 \begin{itemize}
-\item TSPLIB является стандартом для тестирования алгоритмов решения задачи коммивояжёра и имеет множество готовых конфигураций, по которым в том числе можно сравнить метод с другими;
+\item TSPLIB является стандартом для тестирования алгоритмов решения задачи коммивояжёра и имеет множество готовых конфигураций, по которым, в том числе, можно сравнить метод с другими;
 \item формат поддерживает различные типы весов рёбер и графов;
 \item предоставляет обширную библиотеку готовых тестовых задач различной размерности;
 \end{itemize}
@@ -24,18 +24,34 @@
 В качестве основного языка для реализации разрабатываемого метода был выбран язык Go~\cite{go}, так как:
 
 \begin{itemize}
-	\item средства языка достаточно для реализации всех спроектированных алгоритмов и структур данных;
+	\item средств языка достаточно для реализации всех спроектированных алгоритмов и структур данных;
 	\item в стандартной библиотеке присутствуют необходимые структуры данных (массивы, хеш-таблицы) и алгоритмы (сортировка, генерация случайных чисел);
-	\item язык позволяет разделение программы на модули и описание интерфейсов между ними.
+	\item язык позволяет разделять программы на модули и описывать интерфейсы между ними.
 \end{itemize}
 
 \section{Особенности реализации}
 
 \subsection*{Муравей}
 
-В листинге~\ref{lst:ant} представлена структура муравья, хранящая индивидуальные параметры $\alpha$ и $\beta$, что обеспечивает гетерогенность колонии. Табу-список реализованный с помощью встроенной хеш-таблицы go, а маршрут -- срезом.
+В листинге~\ref{lst:ant} представлена структура муравья, хранящая индивидуальные параметры $\alpha$ и $\beta$, что обеспечивает гетерогенность колонии. Табу-список реализован с помощью встроенной хеш-таблицы go, а маршрут -- срезом.
 
-\begin{lstlisting}[caption={Структура муравья}, label={lst:ant}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Структура муравья}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 type HeteroAnt struct {
 	// Configuration parameters
 	alpha               float64
@@ -48,11 +64,30 @@ type HeteroAnt struct {
 	visited map[*graph.Vertex]struct{}
 	...
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:ant}
 
-Алгоритм построение маршрута представлен в листинге~\ref{lst:path} : на каждом шаге муравей выбирает следующую вершину согласно вероятностному правилу, учитывающему его индивидуальные $\alpha$ и $\beta$.
+Алгоритм построения маршрута представлен в листинге~\ref{lst:path} : на каждом шаге муравей выбирает следующую вершину согласно вероятностному правилу, учитывающему его индивидуальные $\alpha$ и $\beta$.
 
-\begin{lstlisting}[caption={Цикл поиска пути муравьём}, label={lst:path}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Цикл поиска пути муравьём}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 func (a *HeteroAnt) Run() error {
 	...
 	for !a.step() {
@@ -100,11 +135,30 @@ func (s *PathClassicStrategy) ChooseNext(ant ant.AntView) *graph.Vertex {
 	}
 	...
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:path}
 
 После завершения построения всех маршрутов, муравьи распыляют феромон на пройденные рёбра согласно алгоритму, представленному на листинге~\ref{lst:phero}. Вызов метода происходит из управляющей структуры -- колонии муравьев.
 
-\begin{lstlisting}[caption={Распыление феромона}, label={lst:phero}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Распыление феромона}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 func (*ApplyClassicStrategy) ApplyPheromone(ant ant.AntView) {
 	...
 	delta := ant.PheromoneMultiplier() / ant.Score()
@@ -116,13 +170,32 @@ func (*ApplyClassicStrategy) ApplyPheromone(ant ant.AntView) {
 	wrapE, _ := g.Edge(path[len(path)-1], path[0])
 	pm.Add(wrapE, delta)
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:phero}
 
 \subsection*{Локальная оптимизация}
 
 Для повышения качества найденных решений и ускорения сходимости в методе может применяться локальная оптимизация маршрутов. На листинге~\ref{lst:2-opt} представлена реализация алгоритма 2-opt, которая применяется к отобранным родителям перед формированием нового поколения.
 
-\begin{lstlisting}[caption={2-opt оптимизация}, label={lst:2-opt}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- 2-opt оптимизация}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 func (s TwoOptLocalOptimisation) Optimise(path []graph.Vertex, g *graph.Graph) {
 	n := len(path)
 	improved := true
@@ -162,14 +235,32 @@ func (s TwoOptLocalOptimisation) swapEdges(path []graph.Vertex, i, j int) {
 		path[start], path[end] = path[end], path[start]
 	}
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:2-opt}
 
 \subsection*{Колония}
 
 Колония (листинг~\ref{lst:colony}) является центральным управляющим компонентом метода. Она хранит популяцию муравьёв, карту феромонов, а также настройки и стратегии генетического алгоритма. Поля \texttt{parentSelect}, \texttt{crossover}, \texttt{mutation} представляют собой стратегии селекции, скрещивания и мутации соответственно. Срез \texttt{observers} содержит зарегистрированных наблюдателей для сбора статистики.
 
-\begin{lstlisting}[caption={Структура колонии}, label={lst:colony}, language=go, numbers=left]
-
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Структура колонии}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 type HeteroAntColony struct {
 	// Стратегии
 	parentSelect      ParentSelectionStrategy
@@ -192,9 +283,12 @@ type HeteroAntColony struct {
 	...
 	observers []ColonyObserver // Наблюдатели
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:colony}
 
-Основной цикл метода представлен в листинге\ref{lst:method}, реализует итерационный процесс:
+Основной цикл метода, представленный в листинге~\ref{lst:method}, реализует итерационный процесс:
 
 \begin{itemize}
 	\item на каждой итерации все муравьи строят маршруты;
@@ -205,16 +299,31 @@ type HeteroAntColony struct {
 	\item если на данной итерации выполнялась селекция, формируется новое поколение, где последовательно применяются скрещивание и мутация, переданные при конфигурации.
 \end{itemize}
 
-\begin{lstlisting}[caption={Основной цикл метода}, label={lst:method}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Основной цикл метода}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 func (c *HeteroAntColony) Run() error {
 	for i := uint(0); i < c.colonySize; i++ {...} // Инициализация первого поколения
 	// Основной цикл
 	for gen := uint(0); gen < c.generationCount; gen++ {
 		for _, a := range c.ants {...a.Run()...} // Построение путей муравьями
-		// Отбор
 		var parents []ant.AntView
-		if gen%c.generationPeriod == 0 {
-		    ...
+		if gen%c.generationPeriod == 0 { // Отбор
+			...
 			parents = c.parentSelect.SelectParents(views, c.parentCount)
 			for _, p := range parents {...a.LocalOptimisation(c.localOptimisation)...} // Локальная оптимизация
 			...
@@ -227,49 +336,81 @@ func (c *HeteroAntColony) Run() error {
 		}
 		c.evaporatePheromones() // Испарение 
 		for _, a := range c.ants {...a.ApplyPheromone()...} // Нанесение феромонов 
-		// Уведомление наблюдателей
 		dto := &ColonyObserverDTO{...}
-		for _, obs := range c.observers {
+		for _, obs := range c.observers { // Уведомление наблюдателей
 			obs.Observe(dto)
 		}
-		
-		// Обновление поколения генетическим   алгоритмом
 		if parents != nil {
-			c.prepareNextGeneration(parents)
+			c.prepareNextGeneration(parents) // Обновление поколения генетическим алгоритмом
 		}
 	}
 	return nil
 }
-// Функция испарения феромонов
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:method}
+
+Вспомогательные функции метода, представленны в листинге~\ref{lst:method-side}.
+
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Основной цикл метода}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 func (c *HeteroAntColony) evaporatePheromones() {
-	factor := 1 - c.evaporationRate
 	c.g.ForEachEdge(func(e *graph.Edge) bool {
-		c.pm.Update(e, c.pm.Get(e)*factor)
-		return false
+		c.pm.Update(e, c.pm.Get(e)*(1 - c.evaporationRate))
 	})
 }
 func (c *HeteroAntColony) prepareNextGeneration(parents []ant.AntView) {
-	// Скрещивание
-	offspring := make([]*ant.HeteroAnt, 0, c.colonySize)
+	offspring := make([]*ant.HeteroAnt, 0, c.colonySize) // Скрещивание
 	for len(offspring) < int(c.colonySize) {
 		p1, p2 := parents[rand.Intn(len(parents) - 1)], parents[rand.Intn(len(parents) - 1)]
 		offspring = append(offspring, c.crossover.Crossover(p1, p2)...)
 	}
-	// Мутация
-	for i := 0; uint(i) < c.colonySize; i++ {
+	for i := 0; uint(i) < c.colonySize; i++ { // Мутация
 		offspring[i] = c.mutation.Mutate(offspring[i])
 	}
-	
-	// Замена
-	c.ants = offspring
 }
-\end{lstlisting}
+		\end{lstlisting}
+\end{minipage}
+\end{longtable}
+\label{lst:method-side}
 
 \subsection*{Стратегии}
 
 В листинге~\ref{lst:strategies} представлены интерфейсы стратегий генетического алгоритма, которые используются колонией для эволюции популяции. Как видно, параметры  мутации хранятся напрямую в её структуре и передаются при создании её экземпляра, что даёт возможность не включать всевозможные параметры стратегий в основную структуру колонии.
 
-\begin{lstlisting}[caption={Интерфейсы стратегий}, label={lst:strategies}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Интерфейсы стратегий}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 type ParentSelectionStrategy interface {
 	SelectParents(ants []ant.AntView, n uint) []ant.AntView
 }
@@ -281,11 +422,30 @@ type CrossoverStrategy interface {
 type MutationStrategy interface {
 	Mutate(ant ant.AntView) *ant.HeteroAnt
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:strategies}
 
 Как пример реализации одного из интерфейсов, в листинге~\ref{lst:gauss} приведена реализация одного из видов мутации -- гауссовской.
 
-\begin{lstlisting}[caption={Гауссова мутация}, label={lst:gauss}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Гауссова мутация}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 type GaussMutationStrategy struct {
 	sigma float64
 	mu    float64
@@ -316,13 +476,33 @@ func (s *GaussMutationStrategy) Mutate(a ant.AntView) *ant.HeteroAnt {
 	a.PheromoneApplyStrategy(),
 	)
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:gauss}
+
 
 \subsection*{Наблюдатели}
 
-Для сбора статистики и мониторинга работы алгоритма в методе реализован паттерн <<Наблюдатель>>. Интерфейс \texttt{ColonyObserver} (листинг~\ref{lst:observer}) содержит метод \texttt{Observe}, принимающий структуру данных \texttt{ColonyObserverDTO}. Она инкапсулирует текущее состояние колонии: популяцию муравьёв, карту феромонов, лучшее найденное решение и номер текущей итерации и позволяет наблюдателем агрегировать эти данные для статистики.
+Для сбора статистики и мониторинга работы алгоритма в методе реализован паттерн <<Наблюдатель>>. Интерфейс \texttt{ColonyObserver} (листинг~\ref{lst:observer}) содержит метод \texttt{Observe}, принимающий структуру данных \texttt{ColonyObserverDTO}. Она инкапсулирует текущее состояние колонии: популяцию муравьёв, карту феромонов, лучшее найденное решение и номер текущей итерации и позволяет наблюдателям агрегировать эти данные для статистики.
 
-\begin{lstlisting}[caption={Интерфейс наблюдателя}, label={lst:observer}, language=go, numbers=left]
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Интерфейс наблюдателя}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 type ColonyObserverDTO struct {
 	C     *HeteroAntColony
 	Ants  []ant.AntView
@@ -337,31 +517,36 @@ type ColonyObserverDTO struct {
 type ColonyObserver interface {
 	Observe(dto *ColonyObserverDTO)
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:observer}
 
 В листинге~\ref{lst:runtime} представлен пример наблюдателя -- \texttt{TimeObserver}, предназначенный для замера времени выполнения. Он сохраняет временные метки для каждой итерации, что позволяет впоследствии проанализировать производительность алгоритма.
 
-\begin{lstlisting}[caption={Наблюдатель времени выполнения}, label={lst:runtime}, language=go, numbers=left]
-type RunTime struct {
-	Run    uint
-	Moment time.Time
-	Time   time.Duration
-}
-
+\refstepcounter{myListingCounter}
+\begin{longtable}{|p{\linewidth}|}
+	\multicolumn{1}{l}{\textbf{Листинг \thechapter.\arabic{myListingCounter} -- Наблюдатель времени выполнения}} \\
+	\hline
+	\endfirsthead
+	\hline
+	\multicolumn{1}{|c|}{\textbf{Продолжение листинга \thechapter.\arabic{myListingCounter}}} \\
+	\hline
+	\endhead
+	\hline
+	\multicolumn{1}{|r|}{} \\[-4pt]
+	\hline
+	\endfoot
+	\hline
+	\endlastfoot
+	\begin{minipage}{\linewidth}
+		\begin{lstlisting}[language=go, numbers=left]
 type TimeObserver struct {
 	startTime time.Time
 	endTime   time.Time
 	runs      []RunTime
 }
-
-func NewTimeObserver(gens uint) *TimeObserver {
-	return &TimeObserver{
-		runs: make([]RunTime, 0, gens),
-	}
-}
-
-var _ colony.ColonyObserver = (*TimeObserver)(nil)
-
+...
 func (o *TimeObserver) Observe(dto *colony.ColonyObserverDTO) {
 	if len(o.runs) == 0 {
 		o.runs = append(o.runs, RunTime{
@@ -378,7 +563,10 @@ func (o *TimeObserver) Observe(dto *colony.ColonyObserverDTO) {
 		Time:   time.Since(lastRun.Moment),
 	})
 }
-\end{lstlisting}
+		\end{lstlisting}
+	\end{minipage}
+\end{longtable}
+\label{lst:runtime}
 
 \section{Тестирование}
 
@@ -386,11 +574,37 @@ func (o *TimeObserver) Observe(dto *colony.ColonyObserverDTO) {
 
 В качестве меры качества покрытия кода использовалась метрика стандартной утилиты cover входящей в состав Go, которая измеряет покрытие кода как процент от выполненных хотя бы единожды выражений~\cite{go-cover}.
 
-Тестами были покрыты модули стратегий, структур данных, а также части ядра, посвященные вычислениям.
+Тестами были покрыты модули стратегий, структур данных, а также части ядра, посвященные вычислениям. В таблице~\ref{tbl:tests} представлено покрытие кода тестами по модулям.
 
-Покрытие кода составило \textbf{42.2\%}.
+\begin{longtable}{|p{0.4\textwidth}|p{0.3\textwidth}|}
+	\caption{Результаты модульного тестирования}\label{tbl:tests} \\
+	\hline
+	\textbf{Модуль} & \textbf{Процент покрытия тестами} \\
+	\hline
+	\endfirsthead
+	\caption*{Продолжение таблицы~\ref{tbl:tests}} \\
+	\hline
+	\textbf{Модуль} & \textbf{Процент покрытия тестами} \\
+	\hline
+	\endhead
+	\hline
+	\endfoot
+	\endlastfoot
+	Ядро & 45.6\% \\
+	\hline
+	Структуры данных & 72.9\% \\
+	\hline
+	Стратегии & 82.3\% \\
+	\hline
+	Наблюдатели & 0\% \\
+	\hline
+	\textbf{Всего} & \textbf{44.3\%} \\
+	\hline
+\end{longtable}
 
 \section{Пример работы ПО}
+
+Для демонстрации работы разработанного метода был разработан web-интерфейс, позволяющий вводить параметры и визуализировать полученное решение, характеристики алгоритма.
 
 В качестве примера работы программы взято решение задачи с входным графом \texttt{ulysses22.tsp}. На рисунке~\ref{fig:params} представлен экран ввода графа и параметров метода.
 
@@ -428,7 +642,7 @@ func (o *TimeObserver) Observe(dto *colony.ColonyObserverDTO) {
 
 \section*{Вывод}
 
-В результате технологической части был обоснован выбор языка программирования Go как средства реализации предложенного метода. Приведены ключевые фрагменты реализации, демонстрирующие: структуру муравья с гетерогенными параметрами $\alpha$ и $\beta$, вероятностное правило выбора следующей вершины, локальную оптимизацию 2-opt, основной цикл колонии с периодической эволюцией популяции, интерфейсы стратегий генетического алгоритма и реализацию паттерна «Наблюдатель» для сбора статистики. Проведено тестирование программной реализации, покрытие кода составило 42,2\%. Представлен пример работы на тестовой задаче \texttt{ulysses22.tsp} с визуализацией решения и эволюции параметров.
+В результате был обоснован выбор языка программирования Go как средства реализации предложенного метода. Приведены ключевые фрагменты реализации, демонстрирующие: структуру муравья с гетерогенными параметрами $\alpha$ и $\beta$, вероятностное правило выбора следующей вершины, локальную оптимизацию 2-opt, основной цикл колонии с периодической эволюцией популяции, интерфейсы стратегий генетического алгоритма и реализацию паттерна «Наблюдатель» для сбора статистики. Проведено тестирование программной реализации, покрытие кода составило 42,2\%. Представлен пример работы на тестовой задаче \texttt{ulysses22.tsp} с визуализацией решения и эволюции параметров.
 
 
 \clearpage

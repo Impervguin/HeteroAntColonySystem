@@ -54,6 +54,10 @@
 		\LARGE\bfseries{#1}
 \end{center}}
 
+\newcommand{\smalsrnotoc}[1]{\begin{center}
+		\Large\bfseries{#1}
+\end{center}}
+
 \makeatletter
 \renewcommand{\@biblabel}[1]{#1.}
 \makeatother
@@ -230,3 +234,6 @@
 	\oldbibitem[#1]{#2}%
 	\fi
 }
+
+\newcounter{myListingCounter}
+\renewcommand{\themyListingCounter}{\thechapter.\arabic{myListingCounter}}
